@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local build logs
+build.log
+*.log
+
+# Slicer output (slice the 3MF yourself; project files stay local)
+*.gcode
+*.bgcode
+
+# CI artifacts downloaded locally
+cad-output/
+
+# Editors / OS
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+.DS_Store

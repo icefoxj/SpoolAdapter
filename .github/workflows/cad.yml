@@ -1,0 +1,30 @@
+name: CAD
+
+on:
+  push:
+    branches: [main]
+    paths: ["cad/**", ".github/workflows/cad.yml"]
+  pull_request:
+    paths: ["cad/**", ".github/workflows/cad.yml"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: cad/requirements.txt
+      - name: Install CadQuery
+        run: pip install -r cad/requirements.txt
+      - name: Checks (diameters, fit, wall, ribs, bed fit, logo strokes and margins, solids) and the two-colour 3MF
+        working-directory: cad
+        run: python build.py --no-render
+      - uses: actions/upload-artifact@v7
+        with:
+          name: SA-01-3mf
+          path: 3mf/
