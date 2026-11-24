@@ -19,12 +19,14 @@ values labelled, mech look, grey never white).
 - Must hold firmly and not slip on the spool.
 - Small tab with the 3DTesla logo, **two colours, 3MF only — no STL** (and no STEP unless asked).
 - Public GitHub repo `SpoolAdapter`, README.md and CLAUDE.md.
-- "Projeto simples": no firmware, app, theory course, manual PDFs, website page or cost workbook unless the user
-  asks (the full kit structure of the family CLAUDE.md does not apply).
+- "Projeto simples": no firmware, app, theory course, manual PDFs, website page or cost workbook (the full kit
+  structure of the family CLAUDE.md does not apply). Confirmed by the user the same day: "Não precisa fazer página
+  no site e nem pdf. É apenas para uso interno." The repository stays public, as first asked.
 
 ## Phase
 
-v0.1.0 (2026-11-24): designed, CAD checks pass, 3MF and renders generated. **Not printed yet**: the check items
+v0.1.1 (2026-11-24): designed, CAD checks pass, 3MF and renders generated (0.1.1 removed two tab corners that
+stood proud of the rolling surface; any shape near the band must be clipped to the bore). **Not printed yet**: the check items
 are in `docs/design.md` §10. When the user prints and measures, record the real fit and update the status lines
 (README, design.md, CHANGELOG).
 

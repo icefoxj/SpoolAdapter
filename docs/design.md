@@ -70,7 +70,8 @@ z = 5.2 mm. Mounted, the bed face is the outer face of the spool and carries the
 - **Lip**: 1.2 mm thick, reaches 3.0 mm inside the rim (to Ø 189.5) on the flange's outer face. Its inner edge and
   the tab outline are chamfered 0.4 mm on the bed face.
 - **Logo tab**: 45 mm wide, reaching 14.25 mm beyond the lip (inner edge 17.25 mm inside the rim), 45° cut corners, same 1.2 mm
-  thickness, centred on +Y. It carries the logo and gives a place to push or pull when fitting or removing.
+  thickness, centred on +Y; its sides run up into the band and it is clipped to the bore, so it never reaches the
+  rolling surface. It carries the logo and gives a place to push or pull when fitting or removing.
 - **Logo**: 40.0 × 13.0 mm, inlaid 0.6 mm into the bed face, mirrored in the model so that it reads correctly from
   outside, letter tops towards the rim.
 
@@ -164,7 +165,8 @@ after the values (the renders always show the default adapter).
 
 ## 9. Automatic checks (`python build.py`)
 
-Outside diameter; rib tips < rim < bore; wall ≥ 1.4 mm; ribs printable; hoop strain < 0.4 %; bed fit; height; logo
+Outside diameter; nothing outside the rolling surface (the volume beyond Ø 199 mm, which the bounding box alone
+would miss: v0.1.0 had the tab's corners 0.8 mm proud); rib tips < rim < bore; wall ≥ 1.4 mm; ribs printable; hoop strain < 0.4 %; bed fit; height; logo
 strokes ≥ 0.8 mm; the logo at least 1 mm inside the flat bed face (clear of every chamfer and edge); the inlay is
 exactly a 0.6 mm slab on the bed; ring and logo do not overlap; valid solids. The 3MF writer then checks both meshes
 (closed, consistently oriented, positive volume, on the bed, the inlay only on its two faces). The rolling surface

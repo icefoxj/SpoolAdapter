@@ -6,7 +6,7 @@ logo on a small tab; no screws, no glue.
 
 ![SA-01 on a spool](docs/img/sa01_hero.png)
 
-> **Status: v0.1.0 (2026-11-24), designed and checked in CAD, not printed yet.** The two spool diameters are
+> **Status: v0.1.1 (2026-11-24), designed and checked in CAD, not printed yet.** The two spool diameters are
 > measured; every other number is a design value or an estimate. See the [changelog](CHANGELOG.md).
 
 ## Why

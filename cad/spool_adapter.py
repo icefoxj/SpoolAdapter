@@ -123,7 +123,10 @@ def ring_body():
     body = (cq.Workplane("XY").circle(R_OUT).extrude(H).val()
             .cut(cq.Workplane("XY").workplane(offset=-1).polyline(bore_outline()).close().extrude(H + 2).val()))
     lip = (cq.Workplane("XY").circle(R_BORE + 0.2).circle(R_LIP_IN).extrude(LIP_T).val())
-    tab = cq.Workplane("XY").polyline(tab_outline()).close().extrude(LIP_T).val()
+    # The tab's straight sides run up into the band; clipped to the bore so its top corners stay inside
+    # the ring (unclipped they stood 0.8 mm proud of the rolling surface, v0.1.0).
+    tab = (cq.Workplane("XY").polyline(tab_outline()).close().extrude(LIP_T).val()
+           .intersect(cq.Workplane("XY").circle(R_BORE + 0.2).extrude(LIP_T).val()))
     body = body.fuse(lip).fuse(tab).clean()
 
     # Lead-in: one cone through the rib tips LEAD_L below the entry edge and ENTRY_C outside the bore at
@@ -176,6 +179,10 @@ def checks(ring, inlay, body=None):
     bb = ring.BoundingBox()
     check("outside diameter", abs(bb.xlen - OD) < 0.02 and abs(bb.ylen - OD) < 0.02,
           f"{bb.xlen:.2f} x {bb.ylen:.2f} mm (target {OD})")
+    # the bounding box alone misses features off the X/Y axes (the v0.1.0 tab corners): test the volume
+    rolling = cq.Solid.makeCylinder(R_OUT + 1e-3, H + 2, cq.Vector(0, 0, -1))
+    proud = ring.cut(rolling).Volume() + inlay.cut(rolling).Volume()
+    check("nothing outside the rolling surface", proud < 1e-6, f"{proud:.4f} mm3 beyond D {OD}")
     check("rim inside the bore, ribs bite", R_TIP < R_RIM < R_BORE,
           f"rib tips D {2 * R_TIP:.2f} < rim D {RIM_D} < bore D {2 * R_BORE:.2f}")
     check("band wall", BAND_T >= 1.4, f"{BAND_T:.2f} mm (>= 1.4, about 3.5 lines of 0.42 mm)")

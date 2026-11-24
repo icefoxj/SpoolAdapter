@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/) (0.x until the adapter is printed and measured).
 
+## [0.1.1] - 2026-11-24
+
+### Fixed
+
+- **Two teeth on the rolling surface at the logo tab** (reported by the user): the tab's straight sides ran up to
+  y = 97.75 mm, so its two top corners (x = ±22.5 mm) reached r = 100.3 mm and stood 0.8 mm proud of the Ø 199 mm
+  rolling surface (2.5 mm³). The tab is now clipped to the bore; nothing reaches beyond r = 99.50 mm. The
+  outside-diameter check only looked at the bounding box, which misses features off the X/Y axes; a new check,
+  "nothing outside the rolling surface", measures the volume beyond Ø 199 mm.
+
 ## [0.1.0] - 2026-11-24
 
 First release: designed and checked in CAD. **Not printed yet**: every number except the two spool diameters is a
