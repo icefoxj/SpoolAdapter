@@ -25,10 +25,17 @@ values labelled, mech look, grey never white).
 - 2026-11-25, after the v0.2.0 print: "O tamanho ficou bom. Agora precisava de 5 pequenos dentinhos para segurar o
   adaptador no local." Confirmed: hooks that pass the rim and lock behind the flange; flange **3.3 mm** thick at the
   rim (measured).
+- 2026-11-25, after the hooks print: "Esse com os dentes ficou perfeito. Agora preciso de um do mesmo tamanho, sem
+  os dentes, e da espessura da versão anterior a versão com dentes." → a second variant, without hooks, 5.2 mm
+  overall (the v0.2.0 ring). Both variants are kept and built.
 
 ## Phase
 
-**v1.0.0 (2026-11-25): printed, confirmed and released** (tag `v1.0.0`, GitHub release with the 3MF attached).
+**v1.1.0 (2026-11-25): two variants, both printed** (tag `v1.1.0`, GitHub release with both 3MFs attached):
+- **with hooks** (default, `HOOKS = True`): the v1.0.0 ring, "perfeito";
+- **without hooks** (`HOOKS = False`, `_no-hooks` 3MF): the v0.2.0 ring, its 3MF identical in content to the
+  v0.2.0 print (size confirmed then).
+
 History of the fit:
 - 0.1.1 removed two tab corners that stood proud of the rolling surface (any shape near the band must be clipped
   to the bore).
@@ -37,6 +44,9 @@ History of the fit:
 - **Second print (v0.2.0): "O tamanho ficou bom"** → `XY_COMP` 0.25 % is confirmed; keep it.
 - v0.3.0 adds five snap hooks behind the 3.3 mm flange. **Third print (v0.3.0): "Impresso. Ficou bom"** → released
   unchanged as v1.0.0 (same 3MF).
+- v1.1.0 adds the variant without hooks back, as asked; nothing changes in the hooks variant.
+- Rebuilding writes new zip timestamps into a 3MF whose content did not change: compare the entries (as done for
+  v1.0.0/v1.1.0) and keep the committed file, which is the one that was printed.
 - Any later change is a new version: record the user's print result (README status, design.md §5/§10, CHANGELOG),
   then commit, annotated tag `vX.Y.Z` and `gh release create` with the 3MF attached. If the hooks ever need a
   tweak: `HOOK_H` (reach, 0.5 mm) if too hard or too weak, `HOOK_CLEAR` (0.1 mm) if the flange does not seat on
@@ -50,14 +60,17 @@ ring stretches 0.10 %); 5 snap hooks at the entry edge (every 72°, the tab midw
 behind the rim, flat catch at z 4.6 = lip 1.2 + flange 3.3 + 0.1, 45° ramp); these are fitted sizes, the 3MF is
 0.25 % larger in X/Y (Ø 199.50 / tips Ø 195.79); lead-in cone; lip 1.2 mm thick (the only width added per side),
 3.0 mm inside the rim on the flange's outer face; logo tab 45 mm wide on the lip; logo 40 × 13 mm inlaid 0.6 mm in the bed face (= outer
-face), mirrored in the model. Prints lip down; two rings per spool.
+face), mirrored in the model. Prints lip down; two rings per spool. **Variant without hooks** (`HOOKS = False`):
+the same ring with no hooks and the band `PLAIN_BAND_L` = 4.0 mm past the lip (5.2 mm overall); the ribs press on
+2.8 of the 3.3 mm flange; held by friction only; 9.8 g.
 
 ## Commands
 
 ```bash
 # CadQuery venv shared by the family (or make one from cad/requirements.txt)
-E:\GitHub\FilamentRecycler\.venv\Scripts\python.exe cad\build.py              # checks + 3MF + renders
+E:\GitHub\FilamentRecycler\.venv\Scripts\python.exe cad\build.py              # both variants: checks + 3MFs + renders
 E:\GitHub\FilamentRecycler\.venv\Scripts\python.exe cad\build.py --no-render  # what CI runs
+E:\GitHub\FilamentRecycler\.venv\Scripts\python.exe cad\build.py --variant no-hooks   # one variant (hooks | no-hooks)
 E:\GitHub\FilamentRecycler\.venv\Scripts\python.exe cad\build.py --rim 194.8 --flange 2.5 --od 199
 E:\GitHub\FilamentRecycler\.venv\Scripts\python.exe cad\build.py --comp 0.35   # looser test file (named _comp0.35)
 ```
@@ -66,7 +79,7 @@ CI (`.github/workflows/cad.yml`) runs the checks and uploads the 3MF.
 
 ## Conventions
 
-- Design frame = print pose: axis Z, lip on the bed (z = 0 … 1.2), flange z = 1.2 … 4.5, band up to z = 6.2. The bed face is the outer
+- Design frame = print pose: axis Z, lip on the bed (z = 0 … 1.2), flange z = 1.2 … 4.5, band up to z = 6.2 (5.2 without hooks). The bed face is the outer
   face when mounted; anything drawn on it is mirrored in X so it reads from outside.
 - Two-colour 3MF in the house format (core 3MF, one object, parts `SpoolAdapter` + `SpoolAdapter_logo`), the logo
   a 0.6 mm slab on the bed (3 layers of 0.2 mm), checked by `export3mf.two_colour`.
@@ -85,11 +98,12 @@ CI (`.github/workflows/cad.yml`) runs the checks and uploads the 3MF.
 
 When a parameter changes in `cad/spool_adapter.py`:
 
-1. `docs/design.md` — §3 geometry, §4 parameter table, §5 retention numbers and print results, §8 scale table.
-2. `README.md` — "How it holds", print and fit sections, the scale table.
+1. `docs/design.md` — §3 geometry (§3a hooks, §3b without hooks), §4 parameter table, §5 retention numbers (both
+   columns; `build.py` prints each variant's hoop section) and print results, §8 scale table.
+2. `README.md` — "Two versions" table, "How it holds", print and fit sections, the scale table.
 3. `CLAUDE.md` — "Design in one paragraph".
-4. Rebuild (`cad/build.py`): the 3MF and `docs/img/sa01_*.png` (the profile drawing is generated from the
-   parameters).
+4. Rebuild (`cad/build.py`, both variants): the two 3MFs and `docs/img/sa01_*.png` (the hooks variant's renders,
+   `sa01_nohooks_*` for the other; the profile drawings are generated from the parameters).
 5. `CHANGELOG.md`.
 
 ## Mech look

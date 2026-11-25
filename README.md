@@ -2,14 +2,29 @@
 
 **A press-fit ring that brings a 195.5 mm filament spool up to 199 mm, so it runs in the Creality Filament
 System (CFS) without slipping.** Two rings per spool, one on each flange; printed in two colours with the 3DTesla
-logo on a small tab; five small hooks click behind the flange; no screws, no glue.
+logo on a small tab; no screws, no glue. Two versions: **with five small hooks** that click behind the flange, or
+**without hooks**, 1 mm shorter.
 
 ![SA-01 on a spool](docs/img/sa01_hero.png)
 
-> **Status: v1.0.0 (2026-11-25), printed and in use.** The third print (v0.3.0 geometry) fits: the size, with the
-> 3MF 0.25 % larger in X/Y for the printer's shrinkage, and the five snap hooks behind the flange are confirmed by
-> the user. The spool's diameter and flange thickness are measured; every other number (forces, torque, mass) is a
-> design value or an estimate. See the [changelog](CHANGELOG.md).
+> **Status: v1.1.0 (2026-11-25), both versions printed.** With hooks: the v1.0.0 file, printed and in use. Without
+> hooks: a file identical in content to the v0.2.0 print, whose size the user confirmed. Both are
+> 0.25 % larger in X/Y for the printer's shrinkage. The spool's diameter and flange thickness are measured; every
+> other number (forces, torque, mass) is a design value or an estimate. See the [changelog](CHANGELOG.md).
+
+## Two versions
+
+| | With hooks (default) | Without hooks |
+|---|---|---|
+| File | [`SpoolAdapter_195.5-to-199mm_2color.3mf`](3mf/SpoolAdapter_195.5-to-199mm_2color.3mf) | [`SpoolAdapter_195.5-to-199mm_no-hooks_2color.3mf`](3mf/SpoolAdapter_195.5-to-199mm_no-hooks_2color.3mf) |
+| Height (lip + band) | 6.2 mm (1.2 + 5.0) | 5.2 mm (1.2 + 4.0) |
+| Holds by | crush ribs + five snap hooks behind the flange: it cannot walk off | crush ribs only (friction) |
+| Fit and removal | one side first, each hook clicks; removal one hook at a time | pressed on evenly; pushed off from the filament side |
+| Mass (estimate) | about 11 g per ring | about 10 g per ring |
+| Printed | v0.3.0 = v1.0.0: "Ficou bom" | v0.2.0: "O tamanho ficou bom" |
+
+Same outside diameter (199.0 mm), same ribs and fit, same lip, tab and logo; only the band's length and the hooks
+differ.
 
 ## Why
 
@@ -40,10 +55,17 @@ for the CFS and warns that a spool that is too small can slip and turn unsteadil
 |---|---|---|
 | ![Tab](docs/img/sa01_tab.png) | ![Ribs](docs/img/sa01_ribs.png) | ![Section](docs/img/sa01_section.png) |
 
+**Without hooks** the band ends 0.7 mm past the flange's inner face and only the ribs hold the rim (they press on
+it over 2.8 of the 3.3 mm flange; above that is the lead-in):
+
+| Profile without hooks | Section without hooks, at the same place |
+|---|---|
+| ![Profile without hooks](docs/img/sa01_nohooks_profile.png) | ![Section without hooks](docs/img/sa01_nohooks_section.png) |
+
 ## Print it
 
-Download [`3mf/SpoolAdapter_195.5-to-199mm_2color.3mf`](3mf/SpoolAdapter_195.5-to-199mm_2color.3mf), or the
-same file from the [latest release](https://github.com/icefoxj/SpoolAdapter/releases/latest).
+Download the version you want from [`3mf/`](3mf/) (table above), or from the
+[latest release](https://github.com/icefoxj/SpoolAdapter/releases/latest). Both print the same way.
 
 1. Open it in Creality Print (or OrcaSlicer, Bambu Studio, PrusaSlicer). It loads as **one object with two
    parts**: `SpoolAdapter` (the ring) and `SpoolAdapter_logo`. Give the ring your dark filament (graphite) and the
@@ -53,8 +75,8 @@ same file from the [latest release](https://github.com/icefoxj/SpoolAdapter/rele
    about 199 mm. The logo is in the first 3 layers, on the face against the plate, so
    the CFS changes colour on those 3 layers only.
 3. Settings: 0.4 mm nozzle, **0.2 mm layers including the first**, 4 walls, no supports, **no brim**.
-   PETG is preferred, PLA works. About 11 g per ring (estimate). The hooks' flat undersides are short (0.75 mm)
-   and print without supports.
+   PETG is preferred, PLA works. About 11 g per ring with hooks, 10 g without (estimates). The hooks' flat
+   undersides are short (0.75 mm) and print without supports.
 4. **Print two**, one for each flange (one ring per plate: 199 mm fits the 260 × 260 mm bed of the Creality Hi).
 
 ![Print layout](docs/img/sa01_print.png)
@@ -71,6 +93,10 @@ same file from the [latest release](https://github.com/icefoxj/SpoolAdapter/rele
 
 To remove it, lift one hook at a time from the filament side (a fingernail or a small flat screwdriver) while
 pulling that part of the ring off, then work round to the next.
+
+**Without hooks**: in step 2 press down evenly all round (or start at one side and work round) until the flange
+rests on the lip everywhere; skip the hook check in step 3. To remove it, push the band off the rim from the
+filament side, a little at a time round the circumference.
 
 **If the fit is wrong**, reprint with X and Y scaled in the slicer (Z stays 100 %); each 0.1 % changes the
 diameters by about 0.2 mm and the outside stays well inside the CFS range (197–202 mm):
@@ -89,19 +115,21 @@ thickness at the rim, and build:
 python -m venv .venv
 .venv\Scripts\python -m pip install -r cad\requirements.txt      # Windows; .venv/bin/python on Linux/macOS
 cd cad
-..\.venv\Scripts\python build.py                                  # checks, the 3MF, the renders
-..\.venv\Scripts\python build.py --rim 194.8 --flange 2.5         # another spool: checks + its own 3MF
+..\.venv\Scripts\python build.py                                  # both versions: checks, 3MFs, renders
+..\.venv\Scripts\python build.py --variant no-hooks               # only one version (hooks | no-hooks)
+..\.venv\Scripts\python build.py --rim 194.8 --flange 2.5         # another spool: checks + its own 3MFs
 ..\.venv\Scripts\python build.py --comp 0.35 --no-render          # looser: more shrinkage compensation
 ```
 
 The build checks the diameters, the fit, the wall, the ribs, the hooks (position over the flange, a free seat for
-the flange, printability), the bed fit, the logo's strokes and margins and the meshes before it writes the 3MF ([design.md §9](docs/design.md#9-automatic-checks-python-buildpy)).
+the flange, printability) or, without hooks, that the band covers the flange and nothing reaches inside the rib
+tips, the bed fit, the logo's strokes and margins and the meshes before it writes each 3MF ([design.md §9](docs/design.md#9-automatic-checks-python-buildpy)).
 
 ## Repository
 
 | Path | What |
 |---|---|
-| `3mf/` | the two-colour 3MF, ready to slice |
+| `3mf/` | the two-colour 3MFs (with hooks, without hooks), ready to slice |
 | `cad/spool_adapter.py` | parameters, geometry and design checks |
 | `cad/logo.py` | the 3DTesla logo, from the brand SVG |
 | `cad/build.py` | build: checks, 3MF, renders, the dimensioned profile |

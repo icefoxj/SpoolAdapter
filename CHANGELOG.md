@@ -4,6 +4,26 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/) (0.x until the adapter was printed and confirmed; 1.0.0 is the first confirmed print).
 
+## [1.1.0] - 2026-11-25
+
+### Added
+
+- **Variant without hooks** (user: "um do mesmo tamanho, sem os dentes, e da espessura da versão anterior à versão
+  com dentes"): `3mf/SpoolAdapter_195.5-to-199mm_no-hooks_2color.3mf`, the v0.2.0 ring. Same diameters, ribs,
+  fit compensation, lip, tab and logo; band 4.0 mm past the lip, 5.2 mm overall (the hooks variant is 6.2 mm);
+  held by the crush ribs only; 9.8 g per ring (estimate). Its 3MF has the same content as the v0.2.0 file the
+  user printed ("O tamanho ficou bom"), compared entry by entry.
+- `HOOKS` and `PLAIN_BAND_L` in `cad/spool_adapter.py`; `cad/build.py` builds and checks both variants
+  (`--variant hooks | no-hooks | both`, default both) and prints the hoop section of each.
+- Checks without hooks: the band covers the flange and the ribs press on at least 75 % of it (2.8 of 3.3 mm),
+  nothing inside the rib tips above the lip.
+- Images `docs/img/sa01_nohooks_profile.png` and `sa01_nohooks_section.png`; README "Two versions"; design.md §3b
+  and a second column in the §5 retention table.
+
+### Unchanged
+
+- The hooks variant and its 3MF (the v1.0.0 file).
+
 ## [1.0.0] - 2026-11-25
 
 First printed and confirmed release. The v0.3.0 ring, printed by the user with the five snap hooks, fits and holds
@@ -81,4 +101,5 @@ design value or an estimate.
   concept and alternatives, parameters, retention estimates, fit adjustment, check items), CI that runs the checks
   and builds the 3MF.
 
+[1.1.0]: https://github.com/icefoxj/SpoolAdapter/releases/tag/v1.1.0
 [1.0.0]: https://github.com/icefoxj/SpoolAdapter/releases/tag/v1.0.0

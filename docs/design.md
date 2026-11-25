@@ -3,9 +3,10 @@
 The contract for the spool adapter: what it must do, why it looks the way it does, every number and where it
 comes from. The CAD (`cad/spool_adapter.py`) implements this page; when one changes, the other changes with it.
 
-**Status (2026-11-25): v1.0.0, printed and confirmed.** The size (v0.2.0 print, 3MF +0.25 % in X/Y, §5) and the
-five snap hooks behind the flange (v0.3.0 print, §3a) fit, per the user. Measured by the user: the two spool
-diameters and the flange thickness. Everything else is a design value or an estimate, and says so.
+**Status (2026-11-25): v1.1.0, two variants, both printed.** The size (v0.2.0 print, 3MF +0.25 % in X/Y, §5) and
+the five snap hooks behind the flange (v0.3.0 print, §3a) fit, per the user. The variant without hooks (§3b) is the
+v0.2.0 ring, its 3MF identical in content to the one printed then. Measured by the user: the two spool diameters
+and the flange thickness. Everything else is a design value or an estimate, and says so.
 
 ## 1. Problem and requirements
 
@@ -24,6 +25,7 @@ User requirements (2026-11-24):
 | R3 | A small **tab with the 3DTesla logo**, in **two colours**, delivered as a **3MF** (no STL). | user |
 | R4 | Public GitHub repository `SpoolAdapter` with README and CLAUDE.md. | user |
 | R5 | (2026-11-25, after the size was right) **five small teeth to hold the adapter in place**: hooks that pass the rim and lock behind the flange. Filamentor flange **3.3 mm** thick at the rim. | user, measured |
+| R6 | (2026-11-25, after the hooks were right) **also a ring of the same size without the teeth, as thick as the version before the hooks** (v0.2.0: 5.2 mm overall). | user |
 
 Derived requirements:
 
@@ -56,7 +58,8 @@ Why this and not the alternatives:
 
 From v0.3.0 five snap hooks on the band's inner edge lock the flange between them and the lip (R5), so the band
 length follows the measured flange thickness (3.3 mm): the ribs grip the whole flange, the hooks click over its
-inner face. For a spool with another flange, rebuild with `--flange` (§8).
+inner face. For a spool with another flange, rebuild with `--flange` (§8). From v1.1.0 the ring without hooks
+(R6) is a second variant of the same model (`HOOKS = False`, §3b), built and checked alongside.
 
 ## 3. Geometry
 
@@ -93,6 +96,20 @@ the logo.
 - **Fitting**: the ring must stretch 0.51 % to pass all five hooks at once, too much to do by hand comfortably.
   Fitted one side first, the closed ring flexes and each hook passes on its own (§ README "Fit it").
 
+### 3b. Variant without hooks (v1.1.0)
+
+`HOOKS = False` (R6): the v0.2.0 ring, built from the same code.
+
+- **Band**: `PLAIN_BAND_L` = 4.0 mm past the lip, 5.2 mm overall; it ends 0.7 mm past the flange's inner face
+  (z = 4.5 mm).
+- **No hooks**: nothing inside the rib tips above the lip (checked by volume).
+- **Grip**: the same 60 ribs, interference, lead-in, lip, tab and logo. The lead-in starts 1.4 mm below the entry
+  edge, so the ribs press on the rim from the lip up to z ≈ 4.0 mm, 2.8 of the 3.3 mm flange (checked: at least
+  75 %); in the hooks variant the band is 1 mm longer and the ribs cover the whole flange.
+- **Axial hold**: friction only, about the press-on force (§5); nothing locks it behind the flange.
+- **Same 3MF as printed**: `SpoolAdapter_195.5-to-199mm_no-hooks_2color.3mf` has the same content (model, mesh,
+  parts) as the v0.2.0 file, compared entry by entry; only the zip timestamps differ.
+
 ## 4. Parameters
 
 All in `cad/spool_adapter.py`. `M` = measured, `D` = design value, `E` = estimate.
@@ -112,6 +129,8 @@ All in `cad/spool_adapter.py`. `M` = measured, `D` = design value, `E` = estimat
 | `HOOK_H` | 0.5 mm | D | hook reach behind the rim |
 | `HOOK_CLEAR`, `HOOK_LAND` | 0.1, 0.4 mm | D | catch clearance above the flange; straight land at the tip |
 | derived `BAND_L` | 5.0 mm | D | band length past the lip: flange + clearance + land + ramp, rounded up to a layer |
+| `HOOKS` | True / False | D | variant: with the hooks (default) or without (R6) |
+| `PLAIN_BAND_L` | 4.0 mm | D | band length past the lip without hooks (5.2 mm overall, as v0.2.0) |
 | `LEAD_L`, `ENTRY_C` | 1.4, 0.4 mm | D | lead-in |
 | `EDGE_C` | 0.4 mm | D | chamfers |
 | `LOGO_H` | 13.0 mm | D | logo height (thinnest stroke 0.84 mm) |
@@ -120,22 +139,24 @@ All in `cad/spool_adapter.py`. `M` = measured, `D` = design value, `E` = estimat
 | `FACE_MARGIN` | 1.0 mm | D | logo kept this far from every edge and chamfer |
 | derived bore | Ø 196.00 mm | D | rib tips + 2 × rib height |
 | derived wall | 1.50 mm | D | (OD − bore) / 2 |
-| mass | 11.1 g per ring | E | PETG 1.27 g/cm³, from the CAD volume; two rings per spool |
+| mass | 11.1 g per ring (9.8 g without hooks) | E | PETG 1.27 g/cm³, from the CAD volume; two rings per spool |
 
 ## 5. Retention (estimates)
 
-Design values: the ring's hoop section is about 12.8 mm² (measured on the CAD between two ribs: band 1.5 × 6.2 mm plus lip 3.25 × 1.2 mm, less
-chamfers); printed PETG E ≈ 2.0 GPa; friction PETG on a plastic spool μ ≈ 0.3 (estimate).
+Design values: the ring's hoop section, measured on the CAD between two ribs (`hoop_section`, printed by the
+build), is 12.8 mm² with hooks (band 1.5 × 6.2 mm plus lip 3.25 × 1.2 mm, less chamfers) and 11.3 mm² without
+(band 5.2 mm); printed PETG E ≈ 2.0 GPa; friction PETG on a plastic spool μ ≈ 0.3 (estimate).
 
-| Quantity | Value | How |
-|---|---|---|
-| hoop strain when fitted | 0.10 % | 0.20 / 195.5 |
-| hoop stress | 2.0 MPa | E·ε (PETG yields around 50 MPa) |
-| hoop force T | 26 N | σ × 12.8 mm² |
-| total clamping force on the rim | 165 N | 2π·T |
-| torque before the ring turns on the rim | ≈ 4.8 N·m | μ × 165 N × 97.75 mm |
-| torque the CFS needs to turn the spool | ≲ 0.3 N·m | filament tension of a few newtons × ≤ 86 mm radius (estimate) |
-| force to press the ring on | ≈ 50 N (5 kgf) | μ × 165 N, plus the hooks' snap |
+| Quantity | With hooks | Without hooks | How |
+|---|---|---|---|
+| hoop strain when fitted | 0.10 % | 0.10 % | 0.20 / 195.5 |
+| hoop stress | 2.0 MPa | 2.0 MPa | E·ε (PETG yields around 50 MPa) |
+| hoop force T | 26 N | 23 N | σ × section |
+| total clamping force on the rim | 165 N | 145 N | 2π·T |
+| torque before the ring turns on the rim | ≈ 4.8 N·m | ≈ 4.3 N·m | μ × clamping force × 97.75 mm |
+| torque the CFS needs to turn the spool | ≲ 0.3 N·m | ≲ 0.3 N·m | filament tension of a few newtons × ≤ 86 mm radius (estimate) |
+| force to press the ring on | ≈ 50 N (5 kgf) | ≈ 44 N (4.5 kgf) | μ × clamping force (with hooks, plus their snap) |
+| axial hold | locked by the hooks | ≈ 44 N | without hooks only friction holds it on the rim |
 
 So the grip has a margin of more than ten against the torque it must carry, at a stress far below anything that
 would creep noticeably at room temperature. In PLA (E ≈ 3.5 GPa) every force is 1.75 times larger.
@@ -159,13 +180,17 @@ The hooks of v0.3.0 scale with it, so they keep their 0.5 mm reach behind the pr
 hooks fits and holds on the Filamentor spool. Released unchanged as v1.0.0. Not measured: the press-on force, the
 torque before the ring turns and the hooks' pull-out force; the numbers above remain estimates.
 
+**Variant without hooks (v1.1.0)**: its 3MF has the same content as the v0.2.0 print, so the size result of the
+second print applies to it.
+
 The ribs make the fit tolerant: the bore between them never touches the rim (0.5 mm clearance on the
 diameter), a seam blob or a slightly oval rim only meets a few ribs, and the ribs press into the rim along their
 length, which also resists turning.
 
 ## 6. Printing
 
-- **One object, two parts** in `3mf/SpoolAdapter_195.5-to-199mm_2color.3mf`: `SpoolAdapter` (the ring, hint
+- **One object, two parts** in `3mf/SpoolAdapter_195.5-to-199mm_2color.3mf` (with hooks) and
+  `3mf/SpoolAdapter_195.5-to-199mm_no-hooks_2color.3mf` (without): `SpoolAdapter` (the ring, hint
   graphite #303236) and `SpoolAdapter_logo` (hint yellow #FFCC00). Core 3MF (2015/02) without slicer extensions,
   the house format (OutageAlarm, LineFollowerRobot): Creality Print, OrcaSlicer, Bambu Studio and PrusaSlicer load
   it as one object whose parts each take a filament; the colours are base materials, a hint the slicer may
@@ -200,8 +225,10 @@ Without CAD, in the slicer: **scale X and Y only** (Z stays 100 %), starting fro
 | still too hard to press on | 100.1 % | `--comp 0.35` | Ø 195.98 | Ø 199.70 |
 
 With CAD: `python build.py --rim <measured> --flange <measured> --od <wanted> --interference <mm> --comp <%>`
-builds the checks and a 3MF (named after the fit values that differ from the defaults; the renders always show the
-default adapter). The hooks follow `--flange`.
+builds the checks and the 3MFs of both variants (named after the fit values that differ from the defaults; the
+renders always show the default adapter); `--variant hooks` or `--variant no-hooks` builds only one. The hooks
+follow `--flange`; without hooks the band stays 4.0 mm past the lip and the build checks that it still covers the
+flange.
 
 ## 9. Automatic checks (`python build.py`)
 
@@ -209,7 +236,8 @@ Outside diameter; nothing outside the rolling surface (the volume beyond Ø 199 
 would miss: v0.1.0 had the tab's corners 0.8 mm proud); rib tips < rim < bore; hooks: catch 0.05–0.3 mm above
 the flange and tip behind the rim, the ribs grip the whole flange, the flange seat free of material inside the rib
 tips between the lip and the hooks, all five hooks present (volume at the land within 2 %), catch overhang ≤ 1 mm
-and ramp ≤ 45°, snap-over strain < 1 %; wall ≥ 1.4 mm; ribs printable; hoop strain < 0.4 %; bed fit; height; logo
+and ramp ≤ 45°, snap-over strain < 1 %; without hooks instead: the band covers the flange and the ribs press on
+at least 75 % of it, nothing inside the rib tips above the lip; wall ≥ 1.4 mm; ribs printable; hoop strain < 0.4 %; bed fit; height; logo
 strokes ≥ 0.8 mm; the logo at least 1 mm inside the flat bed face (clear of every chamfer and edge); the inlay is
 exactly a 0.6 mm slab on the bed; ring and logo do not overlap; valid solids. The 3MF writer then checks both meshes
 (closed, consistently oriented, positive volume, on the bed, the inlay only on its two faces). The rolling surface
@@ -225,4 +253,5 @@ is meshed with an absolute tolerance of 0.01 mm (about 314 facets around).
 - [x] Press-on force of the first print: too tight (2026-11-25) → `XY_COMP` 0.25 % (§5).
 - [x] Size of the v0.2.0 print: right (user, 2026-11-25).
 - [x] v0.3.0 hooks printed and fitted: "Ficou bom" (user, 2026-11-25).
+- [x] Variant without hooks: same 3MF content as the v0.2.0 print (compared, 2026-11-25).
 - [ ] Rewind behaviour in the CFS with the adapters, with a full and a nearly empty spool.

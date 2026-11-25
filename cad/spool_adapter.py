@@ -39,6 +39,10 @@ RIB_TIP_W = 0.6        # flat tip width (printable: > one 0.4 mm line)
 RIB_BASE_W = 1.6
 LIP_T = 1.2            # lip / tab thickness: the only width the adapter adds to the spool, per side
 LIP_DEPTH = 3.0        # how far the lip reaches inside the rim, on the flange's outer face
+HOOKS = True           # variant. True: five snap hooks, the band as long as they need (v0.3.0 = v1.0.0, printed).
+                       # False: no hooks, band PLAIN_BAND_L past the lip (user, 2026-11-25: "um do mesmo tamanho,
+                       # sem os dentes, e da espessura da versão anterior à versão com dentes" = the v0.2.0 ring)
+PLAIN_BAND_L = 4.0     # band length past the lip without hooks: 5.2 mm overall, as printed in v0.2.0
 HOOK_N = 5             # snap hooks on the band's entry edge, one every 72 deg, the logo tab midway between two
 HOOK_H = 0.5           # how far a hook reaches behind the rim, radially (user, 2026-11-25: "5 pequenos dentinhos";
                        # the v0.3.0 print fits: "Ficou bom")
@@ -66,16 +70,17 @@ def _layer_ceil(z):
     return math.ceil(z / LAYER - 1e-6) * LAYER
 
 
-def configure(rim_d=None, od=None, interference=None, comp=None, flange_t=None):
-    """Set the inputs (for another spool: python build.py --rim 194.8 --od 199 --flange 2.5) and derive
-    the rest."""
-    global RIM_D, OD, INTERFERENCE, XY_COMP, FLANGE_T, R_OUT, R_RIM, R_TIP, R_BORE, R_LIP_IN, H, BAND_L, BAND_T
-    global LOGO_W, TAB_W, TAB_Y, LOGO_TOP, Z_CATCH, R_HOOK
+def configure(rim_d=None, od=None, interference=None, comp=None, flange_t=None, hooks=None):
+    """Set the inputs (for another spool: python build.py --rim 194.8 --od 199 --flange 2.5) and the
+    variant (hooks=True/False), and derive the rest. Values left as None keep their current setting."""
+    global RIM_D, OD, INTERFERENCE, XY_COMP, FLANGE_T, HOOKS, R_OUT, R_RIM, R_TIP, R_BORE, R_LIP_IN, H, BAND_L
+    global BAND_T, LOGO_W, TAB_W, TAB_Y, LOGO_TOP, Z_CATCH, R_HOOK
     RIM_D = RIM_D if rim_d is None else rim_d
     OD = OD if od is None else od
     INTERFERENCE = INTERFERENCE if interference is None else interference
     XY_COMP = XY_COMP if comp is None else comp
     FLANGE_T = FLANGE_T if flange_t is None else flange_t
+    HOOKS = HOOKS if hooks is None else hooks
     R_OUT = OD / 2
     R_RIM = RIM_D / 2
     R_TIP = (RIM_D - INTERFERENCE) / 2
@@ -85,7 +90,10 @@ def configure(rim_d=None, od=None, interference=None, comp=None, flange_t=None):
     # a 45 deg ramp up to the band's entry edge (the band is as long as the hooks need)
     Z_CATCH = _layer_ceil(LIP_T + FLANGE_T + HOOK_CLEAR)
     R_HOOK = R_RIM - HOOK_H
-    H = _layer_ceil(Z_CATCH + HOOK_LAND + (R_BORE + ENTRY_C - R_HOOK))
+    if HOOKS:
+        H = _layer_ceil(Z_CATCH + HOOK_LAND + (R_BORE + ENTRY_C - R_HOOK))
+    else:
+        H = LIP_T + PLAIN_BAND_L
     BAND_L = H - LIP_T
     BAND_T = R_OUT - R_BORE
     LOGO_TOP = R_RIM - 1.75                       # 96.0 for the 195.5 mm rim
@@ -145,7 +153,9 @@ def hook_profile():
 
 
 def hooks():
-    """The HOOK_N snap hooks, each HOOK_W wide at its tip (radial side faces)."""
+    """The HOOK_N snap hooks, each HOOK_W wide at its tip (radial side faces); none without hooks."""
+    if not HOOKS:
+        return []
     full = _revolve(hook_profile())
     half = HOOK_W / 2 / R_HOOK
     out = []
@@ -185,9 +195,10 @@ def ring_body():
                      (R_BORE + ENTRY_C + slope, H + 1), (0, H + 1)])
     body = body.cut(cone)
     # snap hooks on the entry edge (added after the lead-in cut: they carry their own ramp)
-    for hook in hooks():
-        body = body.fuse(hook)
-    body = body.clean()
+    if HOOKS:
+        for hook in hooks():
+            body = body.fuse(hook)
+        body = body.clean()
     # outside edges: entry edge and bed edge
     body = body.cut(_revolve([(R_OUT - EDGE_C, H + 0.01), (R_OUT + 0.01, H - EDGE_C - 0.01),
                               (R_OUT + 1, H - EDGE_C - 0.01), (R_OUT + 1, H + 1), (R_OUT - EDGE_C, H + 1)]))
@@ -249,30 +260,39 @@ def checks(ring, inlay, body=None):
           f"{bb.xlen * k:.0f} x {bb.ylen * k:.0f} on {BED}")
     check("height", abs(bb.zlen - H) < 0.01, f"{bb.zlen:.2f} mm")
 
-    # hooks
     flange_top = LIP_T + FLANGE_T
-    check("hooks catch behind the flange", 0.05 <= Z_CATCH - flange_top <= 0.3 and R_HOOK < R_RIM,
-          f"catch face at z {Z_CATCH:.2f} = lip {LIP_T} + flange {FLANGE_T} + {Z_CATCH - flange_top:.2f}; "
-          f"tip {HOOK_H} mm behind the rim (D {2 * R_HOOK:.2f})")
-    check("ribs grip the whole flange", H - LEAD_L >= flange_top,
-          f"full rib height up to z {H - LEAD_L:.2f} >= flange top {flange_top:.2f}")
 
     def inside(r, z0, z1, shape=ring):
         return shape.intersect(cq.Solid.makeCylinder(r, z1 - z0, cq.Vector(0, 0, z0))).Volume()
 
-    seat = inside(R_TIP - 0.01, LIP_T + 0.01, Z_CATCH - 0.01)
-    check("flange seat free", seat < 1e-6,
-          f"{seat:.4f} mm3 of ring inside the rib tips between the lip and the hooks")
-    r_in = R_TIP - 0.01                             # inside the rib tips: only the hooks reach there
-    tips = inside(r_in, Z_CATCH + 0.01, Z_CATCH + HOOK_LAND - 0.01)
-    expect = HOOK_N * (HOOK_W / 2 / R_HOOK) * (r_in ** 2 - R_HOOK ** 2) * (HOOK_LAND - 0.02)
-    check("hooks present", abs(tips / expect - 1) < 0.02,
-          f"{HOOK_N} hooks, {tips:.3f} mm3 inside the rib tips at the land (expected {expect:.3f})")
-    ramp = math.degrees(math.atan2(R_BORE + ENTRY_C - R_HOOK, H - Z_CATCH - HOOK_LAND))
-    check("hooks printable", R_BORE - R_HOOK <= 1.0 and ramp <= 45.0,
-          f"flat catch overhang {R_BORE - R_HOOK:.2f} mm (<= 1.0), ramp {ramp:.0f} deg from vertical")
-    check("snap-over strain", 2 * HOOK_H / RIM_D < 0.01,
-          f"{200 * HOOK_H / RIM_D:.2f} % if all hooks pass at once (elastic); one side first needs far less")
+    r_in = R_TIP - 0.01                             # inside the rib tips: only the hooks may reach there
+    if HOOKS:
+        check("hooks catch behind the flange", 0.05 <= Z_CATCH - flange_top <= 0.3 and R_HOOK < R_RIM,
+              f"catch face at z {Z_CATCH:.2f} = lip {LIP_T} + flange {FLANGE_T} + {Z_CATCH - flange_top:.2f}; "
+              f"tip {HOOK_H} mm behind the rim (D {2 * R_HOOK:.2f})")
+        check("ribs grip the whole flange", H - LEAD_L >= flange_top,
+              f"full rib height up to z {H - LEAD_L:.2f} >= flange top {flange_top:.2f}")
+        seat = inside(r_in, LIP_T + 0.01, Z_CATCH - 0.01)
+        check("flange seat free", seat < 1e-6,
+              f"{seat:.4f} mm3 of ring inside the rib tips between the lip and the hooks")
+        tips = inside(r_in, Z_CATCH + 0.01, Z_CATCH + HOOK_LAND - 0.01)
+        expect = HOOK_N * (HOOK_W / 2 / R_HOOK) * (r_in ** 2 - R_HOOK ** 2) * (HOOK_LAND - 0.02)
+        check("hooks present", abs(tips / expect - 1) < 0.02,
+              f"{HOOK_N} hooks, {tips:.3f} mm3 inside the rib tips at the land (expected {expect:.3f})")
+        ramp = math.degrees(math.atan2(R_BORE + ENTRY_C - R_HOOK, H - Z_CATCH - HOOK_LAND))
+        check("hooks printable", R_BORE - R_HOOK <= 1.0 and ramp <= 45.0,
+              f"flat catch overhang {R_BORE - R_HOOK:.2f} mm (<= 1.0), ramp {ramp:.0f} deg from vertical")
+        check("snap-over strain", 2 * HOOK_H / RIM_D < 0.01,
+              f"{200 * HOOK_H / RIM_D:.2f} % if all hooks pass at once (elastic); one side first needs far less")
+    else:
+        # the rib tips press on the rim from the lip up to where the lead-in lifts them clear of it
+        slope = (R_BORE + ENTRY_C - R_TIP) / LEAD_L
+        z_grip = min(flange_top, H - LEAD_L + (R_RIM - R_TIP) / slope)
+        check("band covers the flange", H >= flange_top and z_grip - LIP_T >= 0.75 * FLANGE_T,
+              f"band up to z {H:.2f} >= flange top {flange_top:.2f}; the ribs press on the rim over "
+              f"{z_grip - LIP_T:.2f} of the {FLANGE_T} mm flange (above that, the lead-in)")
+        stray = inside(r_in, LIP_T + 0.01, H + 0.5)
+        check("no hooks", stray < 1e-6, f"{stray:.4f} mm3 of ring inside the rib tips above the lip")
     check("logo strokes", logo.min_stroke(LOGO_H) >= MIN_STROKE,
           f"thinnest {logo.min_stroke(LOGO_H):.2f} mm (>= {MIN_STROKE})")
 
@@ -301,3 +321,10 @@ def xy_scale():
 
 def mass_g(shape):
     return shape.Volume() / 1000 * PETG_DENSITY
+
+
+def hoop_section(body):
+    """Area (mm2) of the ring's r-z section at 0 deg: between two ribs, away from the tab and the hooks."""
+    t = 0.01
+    slab = cq.Solid.makeBox(R_OUT + 1 - (R_LIP_IN - 1), t, H + 2, cq.Vector(R_LIP_IN - 1, -t / 2, -1))
+    return body.intersect(slab).Volume() / t
