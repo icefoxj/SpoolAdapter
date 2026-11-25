@@ -2,13 +2,14 @@
 
 **A press-fit ring that brings a 195.5 mm filament spool up to 199 mm, so it runs in the Creality Filament
 System (CFS) without slipping.** Two rings per spool, one on each flange; printed in two colours with the 3DTesla
-logo on a small tab; no screws, no glue.
+logo on a small tab; five small hooks click behind the flange; no screws, no glue.
 
 ![SA-01 on a spool](docs/img/sa01_hero.png)
 
-> **Status: v0.2.0 (2026-11-25).** The first print (v0.1.1) was too tight; the 3MF is now 0.25 % larger in X/Y
-> to make up for the printer's shrinkage. Not yet confirmed by a second print. The two spool diameters are
-> measured; every other number is a design value or an estimate. See the [changelog](CHANGELOG.md).
+> **Status: v0.3.0 (2026-11-25).** The size is confirmed by a print (v0.2.0, with the 3MF 0.25 % larger in X/Y
+> for the printer's shrinkage). v0.3.0 adds five snap hooks behind the flange, not printed yet. The spool's
+> diameter and flange thickness are measured; every other number is a design value or an estimate. See the
+> [changelog](CHANGELOG.md).
 
 ## Why
 
@@ -25,14 +26,17 @@ for the CFS and warns that a spool that is too small can slip and turn unsteadil
 - **A closed ring**: the band that wraps the rim is the new rolling surface, Ø 199.0 mm, smooth and with no
   joint for the rollers to bump over.
 - **Press fit with crush ribs**: 60 small axial ribs inside the band are 0.20 mm (on the diameter) tighter than
-  the rim. The ring stretches 0.10 % when pressed on and clamps the rim all round: an estimated 4 N·m before it
+  the rim. The ring stretches 0.10 % when pressed on and clamps the rim all round: an estimated 5 N·m before it
   could turn, more than ten times what the CFS needs ([design.md §5](docs/design.md#5-retention-estimates)).
 - **A lip on the outer face** stops the ring at the right place and is the only width it adds: **1.2 mm per side**
   (the CFS accepts spools up to 68 mm wide). Nothing reaches inside the rim on the filament side.
-- **A lead-in** on the ribs and the bore guides the ring onto the rim.
-- **Any flange up to 4 mm thick** is gripped over its whole thickness.
+- **Five snap hooks** on the band's inner edge, one every 72° (the logo tab midway between two), reach 0.5 mm
+  behind the rim and click over the flange's inner face, 0.1 mm above the measured 3.3 mm flange. Flat catch
+  face: the ring cannot walk off the spool. Each hook is 6 mm wide, and they touch the flange only within 0.5 mm of
+  the rim, clear of the filament.
+- **A lead-in** on the ribs and a 45° ramp on each hook guide the ring onto the rim.
 
-| Outer face with the logo | Crush ribs and lead-in | Section on the flange |
+| Outer face with the logo | Snap hook between the crush ribs | Section: the flange held by a hook |
 |---|---|---|
 | ![Tab](docs/img/sa01_tab.png) | ![Ribs](docs/img/sa01_ribs.png) | ![Section](docs/img/sa01_section.png) |
 
@@ -48,7 +52,8 @@ Download [`3mf/SpoolAdapter_195.5-to-199mm_2color.3mf`](3mf/SpoolAdapter_195.5-t
    about 199 mm. The logo is in the first 3 layers, on the face against the plate, so
    the CFS changes colour on those 3 layers only.
 3. Settings: 0.4 mm nozzle, **0.2 mm layers including the first**, 4 walls, no supports, **no brim**.
-   PETG is preferred, PLA works. About 10 g per ring (estimate).
+   PETG is preferred, PLA works. About 11 g per ring (estimate). The hooks' flat undersides are short (0.75 mm)
+   and print without supports.
 4. **Print two**, one for each flange (one ring per plate: 199 mm fits the 260 × 260 mm bed of the Creality Hi).
 
 ![Print layout](docs/img/sa01_print.png)
@@ -56,12 +61,15 @@ Download [`3mf/SpoolAdapter_195.5-to-199mm_2color.3mf`](3mf/SpoolAdapter_195.5-t
 ## Fit it
 
 1. Lay a ring on the table, logo down.
-2. Set the spool on it so the flange's rim enters the band, and press down evenly all round (or start at one side
-   and work round the circumference) until the flange rests on the lip everywhere.
-3. Turn the spool over and fit the second ring on the other flange.
-4. Check: the ring must not turn on the rim by hand. The spool with both rings must be at most 68 mm wide.
+2. Set the spool on it so the flange's rim enters the band. **Start at one side**: press until the first two
+   hooks click behind the flange, then work round the circumference, pressing down the opposite side last; the ring
+   flexes and each hook clicks in turn. Pressing all five over at once is much harder.
+3. Check that the flange rests on the lip all round and that all five hooks sit behind it.
+4. Turn the spool over and fit the second ring on the other flange.
+5. Check: the ring must not turn on the rim by hand. The spool with both rings must be at most 68 mm wide.
 
-To remove it, push the band off the rim from the filament side, a little at a time round the circumference.
+To remove it, lift one hook at a time from the filament side (a fingernail or a small flat screwdriver) while
+pulling that part of the ring off, then work round to the next.
 
 **If the fit is wrong**, reprint with X and Y scaled in the slicer (Z stays 100 %); each 0.1 % changes the
 diameters by about 0.2 mm and the outside stays well inside the CFS range (197–202 mm):
@@ -73,19 +81,20 @@ diameters by about 0.2 mm and the outside stays well inside the CFS range (197�
 
 ## Another spool
 
-The model is parametric (CadQuery). For a spool of another size, measure its flange diameter and build:
+The model is parametric (CadQuery). For a spool of another size, measure its flange diameter and its flange
+thickness at the rim, and build:
 
 ```bash
 python -m venv .venv
 .venv\Scripts\python -m pip install -r cad\requirements.txt      # Windows; .venv/bin/python on Linux/macOS
 cd cad
 ..\.venv\Scripts\python build.py                                  # checks, the 3MF, the renders
-..\.venv\Scripts\python build.py --rim 194.8 --od 199             # another spool: checks + its own 3MF
+..\.venv\Scripts\python build.py --rim 194.8 --flange 2.5         # another spool: checks + its own 3MF
 ..\.venv\Scripts\python build.py --comp 0.35 --no-render          # looser: more shrinkage compensation
 ```
 
-The build checks the diameters, the fit, the wall, the ribs, the bed fit, the logo's strokes and margins and the
-meshes before it writes the 3MF ([design.md §9](docs/design.md#9-automatic-checks-python-buildpy)).
+The build checks the diameters, the fit, the wall, the ribs, the hooks (position over the flange, a free seat for
+the flange, printability), the bed fit, the logo's strokes and margins and the meshes before it writes the 3MF ([design.md §9](docs/design.md#9-automatic-checks-python-buildpy)).
 
 ## Repository
 

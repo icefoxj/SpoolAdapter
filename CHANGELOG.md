@@ -4,6 +4,26 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/) (0.x until the adapter is printed and measured).
 
+## [0.3.0] - 2026-11-25
+
+The v0.2.0 print has the right size (user: "O tamanho ficou bom"); `XY_COMP` 0.25 % stays.
+
+### Added
+
+- **Five snap hooks** (user: "5 pequenos dentinhos para segurar o adaptador no local") on the band's entry edge,
+  one every 72° with the logo tab midway between two: 6 mm wide, reaching 0.5 mm behind the rim, a flat catch face
+  0.1 mm above the measured **3.3 mm** flange (z = 4.6 mm), a 0.4 mm land and a 44° ramp that lifts each hook over
+  the rim. The flange is held between the lip and the hooks; the ring cannot walk off the spool. The hooks' flat
+  undersides overhang 0.75 mm and print without supports. Not printed yet.
+- `FLANGE_T` (measured) and `--flange` in `cad/build.py`; the band length now follows the flange (5.0 mm past the
+  lip, 6.2 mm overall, 11.1 g per ring, estimate).
+- Checks: hooks over the flange (catch 0.05–0.3 mm above it, tip behind the rim), the ribs grip the whole flange,
+  the flange seat free of material between the lip and the hooks, all five hooks present (volume at the land),
+  printability (overhang ≤ 1 mm, ramp ≤ 45°), snap-over strain.
+- Renders: the bore close-up shows a hook between the ribs; the section cuts through a hook with the flange; the
+  profile drawing is now through a hook. README "Fit it": one side first, then round the circumference; removal one
+  hook at a time.
+
 ## [0.2.0] - 2026-11-25
 
 ### Changed

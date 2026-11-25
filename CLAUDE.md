@@ -22,24 +22,30 @@ values labelled, mech look, grey never white).
 - "Projeto simples": no firmware, app, theory course, manual PDFs, website page or cost workbook (the full kit
   structure of the family CLAUDE.md does not apply). Confirmed by the user the same day: "Não precisa fazer página
   no site e nem pdf. É apenas para uso interno." The repository stays public, as first asked.
+- 2026-11-25, after the v0.2.0 print: "O tamanho ficou bom. Agora precisava de 5 pequenos dentinhos para segurar o
+  adaptador no local." Confirmed: hooks that pass the rim and lock behind the flange; flange **3.3 mm** thick at the
+  rim (measured).
 
 ## Phase
 
-v0.2.0 (2026-11-25): CAD checks pass, 3MF and renders generated. 0.1.1 removed two tab corners that stood
-proud of the rolling surface (any shape near the band must be clipped to the bore). **First print (v0.1.1, user
-2026-11-25): "Ficou muito apertado"** → the 3MF is now written 0.25 % larger in X/Y (`XY_COMP`, print
-shrinkage); the model stays the fitted size. Waiting for the result of the next print: if it is loose or still
-tight, change `XY_COMP` by ±0.1 (≈ 0.2 mm on the diameter); a caliper reading across two opposite ribs of a
-printed ring calibrates it exactly. **Not printed yet**: the check items
-are in `docs/design.md` §10. When the user prints and measures, record the real fit and update the status lines
-(README, design.md, CHANGELOG).
+v0.3.0 (2026-11-25): CAD checks pass, 3MF and renders generated. History of the fit:
+- 0.1.1 removed two tab corners that stood proud of the rolling surface (any shape near the band must be clipped
+  to the bore).
+- **First print (v0.1.1): "Ficou muito apertado"** → v0.2.0 writes the 3MF 0.25 % larger in X/Y (`XY_COMP`, print
+  shrinkage); the model stays the fitted size.
+- **Second print (v0.2.0): "O tamanho ficou bom"** → `XY_COMP` 0.25 % is confirmed; keep it.
+- v0.3.0 adds five snap hooks behind the 3.3 mm flange. **The hooks are not printed yet**: when the user reports,
+  record it (README status, design.md §5/§10, CHANGELOG). Likely tweaks: `HOOK_H` (reach, 0.5 mm) if they are too
+  hard or too weak, `HOOK_CLEAR` (0.1 mm) if the flange does not seat on the lip.
 
 ## Design in one paragraph
 
 Closed ring with an L section (decisions and alternatives in `docs/design.md` §2): band Ø 199.0 outside / Ø 196.0
-bore, 1.5 mm wall, 5.2 mm long; 60 axial crush ribs, tips on Ø 195.3 (0.20 mm interference on the diameter, the
-ring stretches 0.10 %); these are fitted sizes, the 3MF is 0.25 % larger in X/Y (Ø 199.50 / tips Ø 195.79); lead-in cone; lip 1.2 mm thick (the only width added per side), 3.0 mm inside the rim on
-the flange's outer face; logo tab 45 mm wide on the lip; logo 40 × 13 mm inlaid 0.6 mm in the bed face (= outer
+bore, 1.5 mm wall, 6.2 mm long; 60 axial crush ribs, tips on Ø 195.3 (0.20 mm interference on the diameter, the
+ring stretches 0.10 %); 5 snap hooks at the entry edge (every 72°, the tab midway between two; 6 mm wide, 0.5 mm
+behind the rim, flat catch at z 4.6 = lip 1.2 + flange 3.3 + 0.1, 45° ramp); these are fitted sizes, the 3MF is
+0.25 % larger in X/Y (Ø 199.50 / tips Ø 195.79); lead-in cone; lip 1.2 mm thick (the only width added per side),
+3.0 mm inside the rim on the flange's outer face; logo tab 45 mm wide on the lip; logo 40 × 13 mm inlaid 0.6 mm in the bed face (= outer
 face), mirrored in the model. Prints lip down; two rings per spool.
 
 ## Commands
@@ -48,7 +54,7 @@ face), mirrored in the model. Prints lip down; two rings per spool.
 # CadQuery venv shared by the family (or make one from cad/requirements.txt)
 E:\GitHub\FilamentRecycler\.venv\Scripts\python.exe cad\build.py              # checks + 3MF + renders
 E:\GitHub\FilamentRecycler\.venv\Scripts\python.exe cad\build.py --no-render  # what CI runs
-E:\GitHub\FilamentRecycler\.venv\Scripts\python.exe cad\build.py --rim 194.8 --od 199 --interference 0.2
+E:\GitHub\FilamentRecycler\.venv\Scripts\python.exe cad\build.py --rim 194.8 --flange 2.5 --od 199
 E:\GitHub\FilamentRecycler\.venv\Scripts\python.exe cad\build.py --comp 0.35   # looser test file (named _comp0.35)
 ```
 
@@ -56,7 +62,7 @@ CI (`.github/workflows/cad.yml`) runs the checks and uploads the 3MF.
 
 ## Conventions
 
-- Design frame = print pose: axis Z, lip on the bed (z = 0 … 1.2), band up to z = 5.2. The bed face is the outer
+- Design frame = print pose: axis Z, lip on the bed (z = 0 … 1.2), flange z = 1.2 … 4.5, band up to z = 6.2. The bed face is the outer
   face when mounted; anything drawn on it is mirrored in X so it reads from outside.
 - Two-colour 3MF in the house format (core 3MF, one object, parts `SpoolAdapter` + `SpoolAdapter_logo`), the logo
   a 0.6 mm slab on the bed (3 layers of 0.2 mm), checked by `export3mf.two_colour`.
@@ -66,7 +72,10 @@ CI (`.github/workflows/cad.yml`) runs the checks and uploads the 3MF.
   gaps ≥ 0.8 mm; at least 1 mm inside the flat bed face (both checked).
 - Colours: ring graphite #303236, logo yellow #FFCC00 (never orange). If a light printed colour is ever used it is
   grey #A7ABB1, never white.
-- The spool in the renders is an illustration (only its diameter is measured); say so where it matters.
+- The spool in the renders is an illustration (only its diameter and flange thickness are measured); say so
+  where it matters.
+- Every feature inside the bore is checked by volume, not by the bounding box: nothing beyond the rolling surface,
+  nothing in the flange seat between the lip and the hooks, all hooks present.
 
 ## Keep in sync
 

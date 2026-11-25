@@ -26,6 +26,7 @@ import logo
 RIM_D = 195.5          # measured (user, 2026-11-24): Filamentor spool, flange outside diameter
 OD = 199.0             # target (user, 2026-11-24): the Creality spool that runs well in the CFS
                        # (Creality lists 197-202 mm for the CFS; 195.5 is below that range)
+FLANGE_T = 3.3         # measured (user, 2026-11-25): Filamentor flange thickness at the rim
 
 # --------------------------------------------------------------------------------- design values (mm)
 INTERFERENCE = 0.20    # rib tips vs the rim, on the diameter: the ring stretches this much when fitted
@@ -38,7 +39,12 @@ RIB_TIP_W = 0.6        # flat tip width (printable: > one 0.4 mm line)
 RIB_BASE_W = 1.6
 LIP_T = 1.2            # lip / tab thickness: the only width the adapter adds to the spool, per side
 LIP_DEPTH = 3.0        # how far the lip reaches inside the rim, on the flange's outer face
-BAND_L = 4.0           # band length past the lip: grips flanges up to 4 mm thick
+HOOK_N = 5             # snap hooks on the band's entry edge, one every 72 deg, the logo tab midway between two
+HOOK_H = 0.5           # how far a hook reaches behind the rim, radially (user, 2026-11-25: "5 pequenos dentinhos")
+HOOK_W = 6.0           # hook width at its tip
+HOOK_CLEAR = 0.1       # axial clearance between the flange's inner face and the hook's flat catch face
+HOOK_LAND = 0.4        # straight land at the hook tip, above the catch face; then a <= 45 deg ramp to the edge
+LAYER = 0.2            # layer height: the catch face and the band's top sit on layer boundaries
 LEAD_L = 1.4           # lead-in on the rib tips at the entry edge
 ENTRY_C = 0.4          # chamfer on the bore at the entry edge
 EDGE_C = 0.4           # chamfer on the outside edges and on the bed-face outline
@@ -55,20 +61,31 @@ BED = (256.0, 256.0)   # Creality Hi 260 x 260, minus 4 mm for a skirt
 PETG_DENSITY = 1.27    # g/cm3, for the mass estimate
 
 # ------------------------------------------------------------------------------------------- derived
-def configure(rim_d=None, od=None, interference=None, comp=None):
-    """Set the inputs (for another spool: python build.py --rim 194.8 --od 199) and derive the rest."""
-    global RIM_D, OD, INTERFERENCE, XY_COMP, R_OUT, R_RIM, R_TIP, R_BORE, R_LIP_IN, H, BAND_T, LOGO_W, TAB_W
-    global TAB_Y, LOGO_TOP
+def _layer_ceil(z):
+    return math.ceil(z / LAYER - 1e-6) * LAYER
+
+
+def configure(rim_d=None, od=None, interference=None, comp=None, flange_t=None):
+    """Set the inputs (for another spool: python build.py --rim 194.8 --od 199 --flange 2.5) and derive
+    the rest."""
+    global RIM_D, OD, INTERFERENCE, XY_COMP, FLANGE_T, R_OUT, R_RIM, R_TIP, R_BORE, R_LIP_IN, H, BAND_L, BAND_T
+    global LOGO_W, TAB_W, TAB_Y, LOGO_TOP, Z_CATCH, R_HOOK
     RIM_D = RIM_D if rim_d is None else rim_d
     OD = OD if od is None else od
     INTERFERENCE = INTERFERENCE if interference is None else interference
     XY_COMP = XY_COMP if comp is None else comp
+    FLANGE_T = FLANGE_T if flange_t is None else flange_t
     R_OUT = OD / 2
     R_RIM = RIM_D / 2
     R_TIP = (RIM_D - INTERFERENCE) / 2
     R_BORE = R_TIP + RIB_H
     R_LIP_IN = R_RIM - LIP_DEPTH
-    H = LIP_T + BAND_L
+    # hooks: flat catch face just above the flange's inner face, tip HOOK_H inside the rim, then a land and
+    # a 45 deg ramp up to the band's entry edge (the band is as long as the hooks need)
+    Z_CATCH = _layer_ceil(LIP_T + FLANGE_T + HOOK_CLEAR)
+    R_HOOK = R_RIM - HOOK_H
+    H = _layer_ceil(Z_CATCH + HOOK_LAND + (R_BORE + ENTRY_C - R_HOOK))
+    BAND_L = H - LIP_T
     BAND_T = R_OUT - R_BORE
     LOGO_TOP = R_RIM - 1.75                       # 96.0 for the 195.5 mm rim
     LOGO_W = logo.width(LOGO_H)
@@ -113,6 +130,32 @@ def _revolve(profile):
     return cq.Workplane("XZ").polyline(profile).close().revolve(360, (0, 0, 0), (0, 1, 0)).val()
 
 
+def hook_angles():
+    """Hook centres (rad): one every 360/HOOK_N deg, the logo tab (+Y) midway between two."""
+    step = 2 * math.pi / HOOK_N
+    return [math.pi / 2 + step / 2 + k * step for k in range(HOOK_N)]
+
+
+def hook_profile():
+    """(r, z) section of a hook: flat catch face, land at the tip, ramp to the band's entry edge. Its outer
+    side runs 0.6 mm into the band wall for the union."""
+    r_wall = R_BORE + 0.6
+    return [(r_wall, Z_CATCH), (R_HOOK, Z_CATCH), (R_HOOK, Z_CATCH + HOOK_LAND), (R_BORE + ENTRY_C, H), (r_wall, H)]
+
+
+def hooks():
+    """The HOOK_N snap hooks, each HOOK_W wide at its tip (radial side faces)."""
+    full = _revolve(hook_profile())
+    half = HOOK_W / 2 / R_HOOK
+    out = []
+    for a in hook_angles():
+        wedge = (cq.Workplane("XY").workplane(offset=-1)
+                 .polyline([(0, 0), _polar(R_OUT + 5, a - half), _polar(R_OUT + 5, a + half)]).close()
+                 .extrude(H + 2).val())
+        out.append(full.intersect(wedge))
+    return out
+
+
 def logo_to_xy(x, y):
     """SVG point -> model XY. The logo is read from below (the bed face is the outer face when
     mounted), so it is mirrored: the reader's right is -X. Letter tops point to +Y (the rim)."""
@@ -140,6 +183,10 @@ def ring_body():
     cone = _revolve([(0, z_lo), (R_TIP - 0.5 * slope, z_lo), (R_BORE + ENTRY_C, H),
                      (R_BORE + ENTRY_C + slope, H + 1), (0, H + 1)])
     body = body.cut(cone)
+    # snap hooks on the entry edge (added after the lead-in cut: they carry their own ramp)
+    for hook in hooks():
+        body = body.fuse(hook)
+    body = body.clean()
     # outside edges: entry edge and bed edge
     body = body.cut(_revolve([(R_OUT - EDGE_C, H + 0.01), (R_OUT + 0.01, H - EDGE_C - 0.01),
                               (R_OUT + 1, H - EDGE_C - 0.01), (R_OUT + 1, H + 1), (R_OUT - EDGE_C, H + 1)]))
@@ -200,6 +247,31 @@ def checks(ring, inlay, body=None):
     check("fits the bed", bb.xlen * k <= BED[0] and bb.ylen * k <= BED[1],
           f"{bb.xlen * k:.0f} x {bb.ylen * k:.0f} on {BED}")
     check("height", abs(bb.zlen - H) < 0.01, f"{bb.zlen:.2f} mm")
+
+    # hooks
+    flange_top = LIP_T + FLANGE_T
+    check("hooks catch behind the flange", 0.05 <= Z_CATCH - flange_top <= 0.3 and R_HOOK < R_RIM,
+          f"catch face at z {Z_CATCH:.2f} = lip {LIP_T} + flange {FLANGE_T} + {Z_CATCH - flange_top:.2f}; "
+          f"tip {HOOK_H} mm behind the rim (D {2 * R_HOOK:.2f})")
+    check("ribs grip the whole flange", H - LEAD_L >= flange_top,
+          f"full rib height up to z {H - LEAD_L:.2f} >= flange top {flange_top:.2f}")
+
+    def inside(r, z0, z1, shape=ring):
+        return shape.intersect(cq.Solid.makeCylinder(r, z1 - z0, cq.Vector(0, 0, z0))).Volume()
+
+    seat = inside(R_TIP - 0.01, LIP_T + 0.01, Z_CATCH - 0.01)
+    check("flange seat free", seat < 1e-6,
+          f"{seat:.4f} mm3 of ring inside the rib tips between the lip and the hooks")
+    r_in = R_TIP - 0.01                             # inside the rib tips: only the hooks reach there
+    tips = inside(r_in, Z_CATCH + 0.01, Z_CATCH + HOOK_LAND - 0.01)
+    expect = HOOK_N * (HOOK_W / 2 / R_HOOK) * (r_in ** 2 - R_HOOK ** 2) * (HOOK_LAND - 0.02)
+    check("hooks present", abs(tips / expect - 1) < 0.02,
+          f"{HOOK_N} hooks, {tips:.3f} mm3 inside the rib tips at the land (expected {expect:.3f})")
+    ramp = math.degrees(math.atan2(R_BORE + ENTRY_C - R_HOOK, H - Z_CATCH - HOOK_LAND))
+    check("hooks printable", R_BORE - R_HOOK <= 1.0 and ramp <= 45.0,
+          f"flat catch overhang {R_BORE - R_HOOK:.2f} mm (<= 1.0), ramp {ramp:.0f} deg from vertical")
+    check("snap-over strain", 2 * HOOK_H / RIM_D < 0.01,
+          f"{200 * HOOK_H / RIM_D:.2f} % if all hooks pass at once (elastic); one side first needs far less")
     check("logo strokes", logo.min_stroke(LOGO_H) >= MIN_STROKE,
           f"thinnest {logo.min_stroke(LOGO_H):.2f} mm (>= {MIN_STROKE})")
 
