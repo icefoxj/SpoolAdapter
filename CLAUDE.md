@@ -34,11 +34,12 @@ values labelled, mech look, grey never white).
 
 ## Phase
 
-**v1.2.0 (2026-11-25): two variants** (tag `v1.2.0`, GitHub release with both 3MFs attached):
+**v1.2.1 (2026-11-25): two variants, both printed and confirmed** (tag `v1.2.1`, GitHub release with both 3MFs
+attached; "Tudo impresso e ok"):
 - **with hooks** (default, `HOOKS = True`): the v1.0.0 ring, "perfeito", 3MF +0.25 % — unchanged;
 - **without hooks** (`HOOKS = False`, `_no-hooks` 3MF): the v0.2.0 ring, 3MF **+0.35 %** in X/Y from v1.2.0 (a
-  little looser than the v0.2.0 print, as asked). **The +0.35 % file is not printed yet**: when the user reports,
-  record it; if it turns or slides off, try 0.30 %; if still hard, 0.45 %.
+  little looser than the v0.2.0 print, as asked), printed and OK. If a later spool turns or slides off, try
+  0.30 %; if hard, 0.45 %.
 
 History of the fit:
 - 0.1.1 removed two tab corners that stood proud of the rolling surface (any shape near the band must be clipped
@@ -50,6 +51,7 @@ History of the fit:
   unchanged as v1.0.0 (same 3MF).
 - v1.1.0 adds the variant without hooks back, as asked; nothing changes in the hooks variant.
 - v1.2.0 makes the variant without hooks 0.1 % looser (`XY_COMP_NO_HOOKS` 0.35 %); the hooks 3MF is unchanged.
+  **Fourth print (v1.2.0): "Tudo impresso e ok"** → both values confirmed; released unchanged as v1.2.1.
 - Rebuilding writes new zip timestamps into a 3MF whose content did not change: compare the entries (as done for
   v1.0.0/v1.1.0) and keep the committed file, which is the one that was printed.
 - Any later change is a new version: record the user's print result (README status, design.md §5/§10, CHANGELOG),

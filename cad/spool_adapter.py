@@ -35,7 +35,8 @@ XY_COMP = 0.25         # %: the 3MF is this much larger in X and Y than the mode
                        # tips by 0.49 mm on the diameter; confirmed by the v0.2.0 print ("O tamanho ficou bom").
                        # This is the value for the variant with hooks.
 XY_COMP_NO_HOOKS = 0.35  # %: the same for the variant without hooks, 0.1 % looser (user 2026-11-25: "um pouco mais
-                       # larga", i.e. an easier fit): rib tips 0.2 mm larger on the diameter than the v0.2.0 print
+                       # larga", i.e. an easier fit): rib tips 0.2 mm larger on the diameter than the v0.2.0 print;
+                       # confirmed by the v1.2.0 print ("Tudo impresso e ok", 2026-11-25)
 RIB_N = 60             # axial crush ribs on the bore, one every 6 deg
 RIB_H = 0.35           # rib height above the bore
 RIB_TIP_W = 0.6        # flat tip width (printable: > one 0.4 mm line)

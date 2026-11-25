@@ -3,11 +3,11 @@
 The contract for the spool adapter: what it must do, why it looks the way it does, every number and where it
 comes from. The CAD (`cad/spool_adapter.py`) implements this page; when one changes, the other changes with it.
 
-**Status (2026-11-25): v1.2.0, two variants.** The size (v0.2.0 print, 3MF +0.25 % in X/Y, §5) and the five snap
-hooks behind the flange (v0.3.0 print, §3a) fit, per the user. The variant without hooks (§3b) is the v0.2.0 ring;
-from v1.2.0 its 3MF is 0.35 % larger in X/Y, a little looser than the v0.2.0 print, as the user asked; not printed
-yet. Measured by the user: the two spool diameters and the flange thickness. Everything else is a design value or
-an estimate, and says so.
+**Status (2026-11-25): v1.2.1, two variants, both printed and confirmed by the user.** The size (v0.2.0 print, 3MF
++0.25 % in X/Y, §5) and the five snap hooks behind the flange (v0.3.0 print, §3a) fit. The variant without hooks
+(§3b) is the v0.2.0 ring with its 3MF 0.35 % larger in X/Y, a little looser, as the user asked; the v1.2.0 print
+is OK. Measured by the user: the two spool diameters and the flange thickness. Everything else is a design value
+or an estimate, and says so.
 
 ## 1. Problem and requirements
 
@@ -113,7 +113,7 @@ the logo.
   X/Y (`XY_COMP_NO_HOOKS`), 0.1 % more than the hooks variant and the v0.2.0 print: outside Ø 199.70 and rib tips
   Ø 195.98 as drawn, the tips about 0.2 mm larger on the diameter than in the printed v0.2.0 ring (the step the
   §8 table gives for "still too hard to press on"). The model is unchanged. In v1.1.0 this file had the same
-  content as the v0.2.0 file (compared entry by entry).
+  content as the v0.2.0 file (compared entry by entry). Printed by the user: "Tudo impresso e ok" (§5).
 
 ## 4. Parameters
 
@@ -192,6 +192,9 @@ interference, and with it the clamping force, torque and axial hold above, is sm
 given (the v0.2.0 interference was not measured). If the ring turns on the rim or slides off, go back to 0.30 %
 or 0.25 % (§8).
 
+**Fourth print (v1.2.0 without hooks, +0.35 %, user, 2026-11-25): "Tudo impresso e ok"** (all printed and OK).
+`XY_COMP_NO_HOOKS` 0.35 % stays. Not measured either: the press-on force, the torque and the axial hold.
+
 The ribs make the fit tolerant: the bore between them never touches the rim (0.5 mm clearance on the
 diameter), a seam blob or a slightly oval rim only meets a few ribs, and the ribs press into the rim along their
 length, which also resists turning.
@@ -264,5 +267,5 @@ is meshed with an absolute tolerance of 0.01 mm (about 314 facets around).
 - [x] Size of the v0.2.0 print: right (user, 2026-11-25).
 - [x] v0.3.0 hooks printed and fitted: "Ficou bom" (user, 2026-11-25).
 - [x] Variant without hooks, v1.1.0: same 3MF content as the v0.2.0 print (compared, 2026-11-25).
-- [ ] Variant without hooks, v1.2.0 at +0.35 %: easier to press on, and still does not turn or slide off the rim.
+- [x] Variant without hooks, v1.2.0 at +0.35 %: printed and fitted, "Tudo impresso e ok" (user, 2026-11-25).
 - [ ] Rewind behaviour in the CFS with the adapters, with a full and a nearly empty spool.

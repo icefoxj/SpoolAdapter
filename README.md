@@ -7,11 +7,10 @@ logo on a small tab; no screws, no glue. Two versions: **with five small hooks**
 
 ![SA-01 on a spool](docs/img/sa01_hero.png)
 
-> **Status: v1.2.0 (2026-11-25).** With hooks: the v1.0.0 file, printed and in use, 0.25 % larger in X/Y for the
-> printer's shrinkage. Without hooks: the v0.2.0 ring (size confirmed by that print), now written 0.35 % larger in
-> X/Y for an easier fit, as asked; this looser file is not printed yet. The spool's diameter and flange thickness are
-> measured; every other number (forces, torque, mass) is a design value or an estimate. See the
-> [changelog](CHANGELOG.md).
+> **Status: v1.2.1 (2026-11-25): both versions printed and confirmed.** With hooks: the v1.0.0 file, 0.25 % larger
+> in X/Y for the printer's shrinkage. Without hooks: the v0.2.0 ring written 0.35 % larger in X/Y for an easier
+> fit (v1.2.0), printed and OK. The spool's diameter and flange thickness are measured; every other number
+> (forces, torque, mass) is a design value or an estimate. See the [changelog](CHANGELOG.md).
 
 ## Two versions
 
@@ -23,7 +22,7 @@ logo on a small tab; no screws, no glue. Two versions: **with five small hooks**
 | Fit and removal | one side first, each hook clicks; removal one hook at a time | pressed on evenly; pushed off from the filament side |
 | File scale in X/Y | +0.25 % (Ø 199.50 outside, rib tips Ø 195.79 as drawn) | +0.35 %, a little looser (Ø 199.70, tips Ø 195.98) |
 | Mass (estimate) | about 11 g per ring | about 10 g per ring |
-| Printed | v0.3.0 = v1.0.0: "Ficou bom" | v0.2.0 at +0.25 %: "O tamanho ficou bom"; the +0.35 % file not yet |
+| Printed | v0.3.0 = v1.0.0: "Ficou bom" | v1.2.0 at +0.35 %: "Tudo impresso e ok" (v0.2.0 at +0.25 %: "O tamanho ficou bom") |
 
 Same model diameters (199.0 mm outside), same ribs, lip, tab and logo; the band's length, the hooks and the scale
 of the file differ.

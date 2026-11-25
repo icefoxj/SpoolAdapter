@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/) (0.x until the adapter was printed and confirmed; 1.0.0 is the first confirmed print).
 
+## [1.2.1] - 2026-11-25
+
+Both versions printed and confirmed by the user ("Tudo impresso e ok"): the variant without hooks at +0.35 %
+fits and holds. The geometry and both 3MFs are the same as in 1.2.0.
+
+### Changed
+
+- Status lines in the README, `docs/design.md` (§3b, §5 print results, §10 check items), `CLAUDE.md` and the
+  `XY_COMP_NO_HOOKS` comment record the fourth print.
+
 ## [1.2.0] - 2026-11-25
 
 ### Changed
@@ -116,6 +126,7 @@ design value or an estimate.
   concept and alternatives, parameters, retention estimates, fit adjustment, check items), CI that runs the checks
   and builds the 3MF.
 
+[1.2.1]: https://github.com/icefoxj/SpoolAdapter/releases/tag/v1.2.1
 [1.2.0]: https://github.com/icefoxj/SpoolAdapter/releases/tag/v1.2.0
 [1.1.0]: https://github.com/icefoxj/SpoolAdapter/releases/tag/v1.1.0
 [1.0.0]: https://github.com/icefoxj/SpoolAdapter/releases/tag/v1.0.0
