@@ -3,9 +3,9 @@
 The contract for the spool adapter: what it must do, why it looks the way it does, every number and where it
 comes from. The CAD (`cad/spool_adapter.py`) implements this page; when one changes, the other changes with it.
 
-**Status (2026-11-25): size confirmed by a print (v0.2.0, 3MF +0.25 % in X/Y, §5); v0.3.0 adds five snap hooks
-behind the flange (§3a), not printed yet.** Measured by the user: the two spool diameters and the flange
-thickness. Everything else is a design value or an estimate, and says so.
+**Status (2026-11-25): v1.0.0, printed and confirmed.** The size (v0.2.0 print, 3MF +0.25 % in X/Y, §5) and the
+five snap hooks behind the flange (v0.3.0 print, §3a) fit, per the user. Measured by the user: the two spool
+diameters and the flange thickness. Everything else is a design value or an estimate, and says so.
 
 ## 1. Problem and requirements
 
@@ -155,6 +155,10 @@ ring across two opposite ribs (rib *i* and rib *i* + 30) would pin it down.
 **Second print (v0.2.0, user, 2026-11-25): "O tamanho ficou bom"** (the size is right). `XY_COMP` 0.25 % stays.
 The hooks of v0.3.0 scale with it, so they keep their 0.5 mm reach behind the printed rim.
 
+**Third print (v0.3.0, user, 2026-11-25): "Impresso. Ficou bom"** (printed, it is good): the ring with the five
+hooks fits and holds on the Filamentor spool. Released unchanged as v1.0.0. Not measured: the press-on force, the
+torque before the ring turns and the hooks' pull-out force; the numbers above remain estimates.
+
 The ribs make the fit tolerant: the bore between them never touches the rim (0.5 mm clearance on the
 diameter), a seam blob or a slightly oval rim only meets a few ribs, and the ribs press into the rim along their
 length, which also resists turning.
@@ -220,6 +224,5 @@ is meshed with an absolute tolerance of 0.01 mm (about 314 facets around).
       windows, turn the ring so the tab lands on a flat area.
 - [x] Press-on force of the first print: too tight (2026-11-25) → `XY_COMP` 0.25 % (§5).
 - [x] Size of the v0.2.0 print: right (user, 2026-11-25).
-- [ ] v0.3.0 hooks: they click behind the flange without forcing, the flange rests on the lip, the hooks' undersides
-      print clean, the ring can be removed one hook at a time.
+- [x] v0.3.0 hooks printed and fitted: "Ficou bom" (user, 2026-11-25).
 - [ ] Rewind behaviour in the CFS with the adapters, with a full and a nearly empty spool.

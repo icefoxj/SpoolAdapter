@@ -32,7 +32,7 @@ FLANGE_T = 3.3         # measured (user, 2026-11-25): Filamentor flange thicknes
 INTERFERENCE = 0.20    # rib tips vs the rim, on the diameter: the ring stretches this much when fitted
 XY_COMP = 0.25         # %: the 3MF is this much larger in X and Y than the model, for the printer's shrinkage.
                        # First print with 0 (v0.1.1, user 2026-11-25): "muito apertado"; 0.25 % opens the rib
-                       # tips by 0.49 mm on the diameter (design value, to be confirmed by the next print)
+                       # tips by 0.49 mm on the diameter; confirmed by the v0.2.0 print ("O tamanho ficou bom")
 RIB_N = 60             # axial crush ribs on the bore, one every 6 deg
 RIB_H = 0.35           # rib height above the bore
 RIB_TIP_W = 0.6        # flat tip width (printable: > one 0.4 mm line)
@@ -40,7 +40,8 @@ RIB_BASE_W = 1.6
 LIP_T = 1.2            # lip / tab thickness: the only width the adapter adds to the spool, per side
 LIP_DEPTH = 3.0        # how far the lip reaches inside the rim, on the flange's outer face
 HOOK_N = 5             # snap hooks on the band's entry edge, one every 72 deg, the logo tab midway between two
-HOOK_H = 0.5           # how far a hook reaches behind the rim, radially (user, 2026-11-25: "5 pequenos dentinhos")
+HOOK_H = 0.5           # how far a hook reaches behind the rim, radially (user, 2026-11-25: "5 pequenos dentinhos";
+                       # the v0.3.0 print fits: "Ficou bom")
 HOOK_W = 6.0           # hook width at its tip
 HOOK_CLEAR = 0.1       # axial clearance between the flange's inner face and the hook's flat catch face
 HOOK_LAND = 0.4        # straight land at the hook tip, above the catch face; then a <= 45 deg ramp to the edge

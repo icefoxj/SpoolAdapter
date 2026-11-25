@@ -6,10 +6,10 @@ logo on a small tab; five small hooks click behind the flange; no screws, no glu
 
 ![SA-01 on a spool](docs/img/sa01_hero.png)
 
-> **Status: v0.3.0 (2026-11-25).** The size is confirmed by a print (v0.2.0, with the 3MF 0.25 % larger in X/Y
-> for the printer's shrinkage). v0.3.0 adds five snap hooks behind the flange, not printed yet. The spool's
-> diameter and flange thickness are measured; every other number is a design value or an estimate. See the
-> [changelog](CHANGELOG.md).
+> **Status: v1.0.0 (2026-11-25), printed and in use.** The third print (v0.3.0 geometry) fits: the size, with the
+> 3MF 0.25 % larger in X/Y for the printer's shrinkage, and the five snap hooks behind the flange are confirmed by
+> the user. The spool's diameter and flange thickness are measured; every other number (forces, torque, mass) is a
+> design value or an estimate. See the [changelog](CHANGELOG.md).
 
 ## Why
 
@@ -42,7 +42,8 @@ for the CFS and warns that a spool that is too small can slip and turn unsteadil
 
 ## Print it
 
-Download [`3mf/SpoolAdapter_195.5-to-199mm_2color.3mf`](3mf/SpoolAdapter_195.5-to-199mm_2color.3mf).
+Download [`3mf/SpoolAdapter_195.5-to-199mm_2color.3mf`](3mf/SpoolAdapter_195.5-to-199mm_2color.3mf), or the
+same file from the [latest release](https://github.com/icefoxj/SpoolAdapter/releases/latest).
 
 1. Open it in Creality Print (or OrcaSlicer, Bambu Studio, PrusaSlicer). It loads as **one object with two
    parts**: `SpoolAdapter` (the ring) and `SpoolAdapter_logo`. Give the ring your dark filament (graphite) and the

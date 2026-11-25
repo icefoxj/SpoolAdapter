@@ -2,7 +2,18 @@
 
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
-[Semantic Versioning](https://semver.org/) (0.x until the adapter is printed and measured).
+[Semantic Versioning](https://semver.org/) (0.x until the adapter was printed and confirmed; 1.0.0 is the first confirmed print).
+
+## [1.0.0] - 2026-11-25
+
+First printed and confirmed release. The v0.3.0 ring, printed by the user with the five snap hooks, fits and holds
+on the Filamentor spool ("Impresso. Ficou bom"). The geometry and the 3MF are the same as in 0.3.0.
+
+### Changed
+
+- Status lines in the README, `docs/design.md` (§5 print results, §10 check items), `CLAUDE.md` and the parameter
+  comments record the three prints: v0.1.1 too tight, v0.2.0 the right size, v0.3.0 the hooks good.
+- README: the 3MF can also be downloaded from the GitHub release.
 
 ## [0.3.0] - 2026-11-25
 
@@ -69,3 +80,5 @@ design value or an estimate.
 - **Renders and a dimensioned profile drawing** (`docs/img/`), **design document** (`docs/design.md`: requirements,
   concept and alternatives, parameters, retention estimates, fit adjustment, check items), CI that runs the checks
   and builds the 3MF.
+
+[1.0.0]: https://github.com/icefoxj/SpoolAdapter/releases/tag/v1.0.0

@@ -28,15 +28,19 @@ values labelled, mech look, grey never white).
 
 ## Phase
 
-v0.3.0 (2026-11-25): CAD checks pass, 3MF and renders generated. History of the fit:
+**v1.0.0 (2026-11-25): printed, confirmed and released** (tag `v1.0.0`, GitHub release with the 3MF attached).
+History of the fit:
 - 0.1.1 removed two tab corners that stood proud of the rolling surface (any shape near the band must be clipped
   to the bore).
 - **First print (v0.1.1): "Ficou muito apertado"** → v0.2.0 writes the 3MF 0.25 % larger in X/Y (`XY_COMP`, print
   shrinkage); the model stays the fitted size.
 - **Second print (v0.2.0): "O tamanho ficou bom"** → `XY_COMP` 0.25 % is confirmed; keep it.
-- v0.3.0 adds five snap hooks behind the 3.3 mm flange. **The hooks are not printed yet**: when the user reports,
-  record it (README status, design.md §5/§10, CHANGELOG). Likely tweaks: `HOOK_H` (reach, 0.5 mm) if they are too
-  hard or too weak, `HOOK_CLEAR` (0.1 mm) if the flange does not seat on the lip.
+- v0.3.0 adds five snap hooks behind the 3.3 mm flange. **Third print (v0.3.0): "Impresso. Ficou bom"** → released
+  unchanged as v1.0.0 (same 3MF).
+- Any later change is a new version: record the user's print result (README status, design.md §5/§10, CHANGELOG),
+  then commit, annotated tag `vX.Y.Z` and `gh release create` with the 3MF attached. If the hooks ever need a
+  tweak: `HOOK_H` (reach, 0.5 mm) if too hard or too weak, `HOOK_CLEAR` (0.1 mm) if the flange does not seat on
+  the lip.
 
 ## Design in one paragraph
 
