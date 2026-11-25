@@ -6,7 +6,8 @@ logo on a small tab; no screws, no glue.
 
 ![SA-01 on a spool](docs/img/sa01_hero.png)
 
-> **Status: v0.1.1 (2026-11-24), designed and checked in CAD, not printed yet.** The two spool diameters are
+> **Status: v0.2.0 (2026-11-25).** The first print (v0.1.1) was too tight; the 3MF is now 0.25 % larger in X/Y
+> to make up for the printer's shrinkage. Not yet confirmed by a second print. The two spool diameters are
 > measured; every other number is a design value or an estimate. See the [changelog](CHANGELOG.md).
 
 ## Why
@@ -42,7 +43,9 @@ Download [`3mf/SpoolAdapter_195.5-to-199mm_2color.3mf`](3mf/SpoolAdapter_195.5-t
 1. Open it in Creality Print (or OrcaSlicer, Bambu Studio, PrusaSlicer). It loads as **one object with two
    parts**: `SpoolAdapter` (the ring) and `SpoolAdapter_logo`. Give the ring your dark filament (graphite) and the
    logo the second colour (yellow). The colours in the file are only a hint.
-2. Keep it as it comes: **lip on the plate**. The logo is in the first 3 layers, on the face against the plate, so
+2. Keep it as it comes: **lip on the plate**, **scale 100 %**. The file is deliberately 0.25 % larger in X and Y
+   than the fitted ring (Ø 199.5 mm outside as drawn) because large printed rings shrink; the print comes out at
+   about 199 mm. The logo is in the first 3 layers, on the face against the plate, so
    the CFS changes colour on those 3 layers only.
 3. Settings: 0.4 mm nozzle, **0.2 mm layers including the first**, 4 walls, no supports, **no brim**.
    PETG is preferred, PLA works. About 10 g per ring (estimate).
@@ -61,12 +64,12 @@ Download [`3mf/SpoolAdapter_195.5-to-199mm_2color.3mf`](3mf/SpoolAdapter_195.5-t
 To remove it, push the band off the rim from the filament side, a little at a time round the circumference.
 
 **If the fit is wrong**, reprint with X and Y scaled in the slicer (Z stays 100 %); each 0.1 % changes the
-diameters by about 0.2 mm and the outside stays well inside the CFS range:
+diameters by about 0.2 mm and the outside stays well inside the CFS range (197–202 mm):
 
-| Fit | Scale X/Y | Outside diameter |
+| Fit | Scale X/Y | Same as rebuilding with |
 |---|---|---|
-| loose, turns by hand | 99.8 % | 198.6 mm |
-| too hard to press on | 100.2 % | 199.4 mm |
+| loose, turns by hand | 99.9 % | `--comp 0.15` |
+| still too hard to press on | 100.1 % | `--comp 0.35` |
 
 ## Another spool
 
@@ -78,7 +81,7 @@ python -m venv .venv
 cd cad
 ..\.venv\Scripts\python build.py                                  # checks, the 3MF, the renders
 ..\.venv\Scripts\python build.py --rim 194.8 --od 199             # another spool: checks + its own 3MF
-..\.venv\Scripts\python build.py --interference 0.3 --no-render   # a tighter fit
+..\.venv\Scripts\python build.py --comp 0.35 --no-render          # looser: more shrinkage compensation
 ```
 
 The build checks the diameters, the fit, the wall, the ribs, the bed fit, the logo's strokes and margins and the

@@ -4,6 +4,7 @@
     python build.py --no-render  checks + 3MF (what CI runs)
     python build.py --rim 194.8 --od 199 --interference 0.2
                                  another spool: checks + its own 3MF (the renders show the default)
+    python build.py --comp 0.35  looser (more shrinkage compensation); --comp 0.15 tighter
 
 Outputs (repository root):
     3mf/SpoolAdapter_195.5-to-199mm_2color.3mf   ring (graphite) + logo (yellow), print pose
@@ -29,10 +30,15 @@ REPO = os.path.normpath(os.path.join(HERE, ".."))
 IMG = os.path.join(REPO, "docs", "img")
 
 
+DEFAULT_FIT = (sa.INTERFERENCE, sa.XY_COMP)
+
+
 def out_3mf():
     name = f"SpoolAdapter_{sa.RIM_D:g}-to-{sa.OD:g}mm_2color.3mf"
-    if abs(sa.INTERFERENCE - 0.20) > 1e-9:
+    if abs(sa.INTERFERENCE - DEFAULT_FIT[0]) > 1e-9:
         name = name.replace("_2color", f"_fit{sa.INTERFERENCE:g}_2color")
+    if abs(sa.XY_COMP - DEFAULT_FIT[1]) > 1e-9:
+        name = name.replace("_2color", f"_comp{sa.XY_COMP:g}_2color")
     return os.path.join(REPO, "3mf", name)
 
 # The spool in the renders is an illustration: only its 195.5 mm diameter is measured.
@@ -159,6 +165,9 @@ def profile(path):
     ax.text(89.5, -3.6, f"Interference {sa.INTERFERENCE:.2f} mm on the diameter: the closed ring stretches "
             f"{100 * sa.INTERFERENCE / sa.RIM_D:.2f} % and clamps the rim. Design values; dimensions in mm.",
             fontsize=8, color="#55595F")
+    ax.text(89.5, -4.3, f"Fitted sizes. The 3MF is {sa.XY_COMP:g} % larger in X/Y for the printer's shrinkage "
+            f"(outside Ø {sa.OD * sa.xy_scale():.2f}, rib tips Ø {2 * sa.R_TIP * sa.xy_scale():.2f} as drawn): "
+            f"the first print, without it, was too tight.", fontsize=8, color="#55595F")
     # title band (mech look): unit code knocked out of a yellow band with a 45 deg cut
     ax.add_patch(Polygon([(89.5, 11.0), (92.4, 11.0), (93.0, 11.6), (89.5, 11.6)], closed=True, fc=Y, ec="none",
                          clip_on=False))
@@ -166,7 +175,7 @@ def profile(path):
     ax.text(93.3, 11.3, "SPOOL ADAPTER  ·  PROFILE THROUGH A RIB", fontsize=11, fontweight="bold", color=INK,
             va="center")
     ax.set_xlim(89.3, 107.8)
-    ax.set_ylim(-4.2, 11.9)
+    ax.set_ylim(-4.8, 11.9)
     ax.set_aspect("equal")
     ax.axis("off")
     fig.savefig(path, bbox_inches="tight", facecolor="white")
@@ -181,14 +190,16 @@ def main():
     ap.add_argument("--rim", type=float, help=f"measured flange diameter of the spool (default {sa.RIM_D})")
     ap.add_argument("--od", type=float, help=f"outside diameter wanted (default {sa.OD}; CFS: 197-202)")
     ap.add_argument("--interference", type=float, help=f"rib tips vs rim, on the diameter (default {sa.INTERFERENCE})")
+    ap.add_argument("--comp", type=float,
+                    help=f"%% larger in X/Y in the 3MF, for print shrinkage (default {sa.XY_COMP}; looser = more)")
     args = ap.parse_args()
-    custom = any(v is not None for v in (args.rim, args.od, args.interference))
-    sa.configure(args.rim, args.od, args.interference)
+    custom = any(v is not None for v in (args.rim, args.od, args.interference, args.comp))
+    sa.configure(args.rim, args.od, args.interference, args.comp)
 
     t0 = time.time()
     log("SA-01 spool adapter")
     log(f"   rim {sa.RIM_D} -> outside {sa.OD} mm, interference {sa.INTERFERENCE} mm, "
-        f"{sa.RIB_N} ribs, lip {sa.LIP_T} mm, band {sa.BAND_L} mm")
+        f"{sa.RIB_N} ribs, lip {sa.LIP_T} mm, band {sa.BAND_L} mm, 3MF +{sa.XY_COMP:g} % in X/Y")
     body = sa.ring_body()
     ring, inlay = sa.build()
     results = sa.checks(ring, inlay, body)
@@ -203,7 +214,7 @@ def main():
         return 1
     if not args.no_export:
         path = out_3mf()
-        n = export3mf.two_colour(path, "SpoolAdapter", ring, inlay)
+        n = export3mf.two_colour(path, "SpoolAdapter", ring, inlay, xy_scale=sa.xy_scale())
         log(f"3mf -> {os.path.relpath(path, REPO)} (logo in the first {n} layers)")
     if custom:
         log("renders skipped: they document the default adapter")

@@ -29,6 +29,9 @@ OD = 199.0             # target (user, 2026-11-24): the Creality spool that runs
 
 # --------------------------------------------------------------------------------- design values (mm)
 INTERFERENCE = 0.20    # rib tips vs the rim, on the diameter: the ring stretches this much when fitted
+XY_COMP = 0.25         # %: the 3MF is this much larger in X and Y than the model, for the printer's shrinkage.
+                       # First print with 0 (v0.1.1, user 2026-11-25): "muito apertado"; 0.25 % opens the rib
+                       # tips by 0.49 mm on the diameter (design value, to be confirmed by the next print)
 RIB_N = 60             # axial crush ribs on the bore, one every 6 deg
 RIB_H = 0.35           # rib height above the bore
 RIB_TIP_W = 0.6        # flat tip width (printable: > one 0.4 mm line)
@@ -52,13 +55,14 @@ BED = (256.0, 256.0)   # Creality Hi 260 x 260, minus 4 mm for a skirt
 PETG_DENSITY = 1.27    # g/cm3, for the mass estimate
 
 # ------------------------------------------------------------------------------------------- derived
-def configure(rim_d=None, od=None, interference=None):
+def configure(rim_d=None, od=None, interference=None, comp=None):
     """Set the inputs (for another spool: python build.py --rim 194.8 --od 199) and derive the rest."""
-    global RIM_D, OD, INTERFERENCE, R_OUT, R_RIM, R_TIP, R_BORE, R_LIP_IN, H, BAND_T, LOGO_W, TAB_W, TAB_Y
-    global LOGO_TOP
+    global RIM_D, OD, INTERFERENCE, XY_COMP, R_OUT, R_RIM, R_TIP, R_BORE, R_LIP_IN, H, BAND_T, LOGO_W, TAB_W
+    global TAB_Y, LOGO_TOP
     RIM_D = RIM_D if rim_d is None else rim_d
     OD = OD if od is None else od
     INTERFERENCE = INTERFERENCE if interference is None else interference
+    XY_COMP = XY_COMP if comp is None else comp
     R_OUT = OD / 2
     R_RIM = RIM_D / 2
     R_TIP = (RIM_D - INTERFERENCE) / 2
@@ -189,7 +193,12 @@ def checks(ring, inlay, body=None):
     check("ribs printable", RIB_TIP_W >= 0.45 and RIB_H >= 0.2, f"tip {RIB_TIP_W} mm, height {RIB_H} mm")
     check("hoop strain when fitted", INTERFERENCE / RIM_D < 0.004,
           f"{100 * INTERFERENCE / RIM_D:.2f} % (PETG and PLA stay elastic far beyond 1 %)")
-    check("fits the bed", bb.xlen <= BED[0] and bb.ylen <= BED[1], f"{bb.xlen:.0f} x {bb.ylen:.0f} on {BED}")
+    k = xy_scale()
+    check("print compensation", 0 <= XY_COMP <= 1.0 and 197.0 <= OD * k <= 202.0,
+          f"3MF {XY_COMP:g} % larger in X/Y: outside D {OD * k:.2f}, rib tips D {2 * R_TIP * k:.2f} as drawn "
+          f"(CFS 197-202)")
+    check("fits the bed", bb.xlen * k <= BED[0] and bb.ylen * k <= BED[1],
+          f"{bb.xlen * k:.0f} x {bb.ylen * k:.0f} on {BED}")
     check("height", abs(bb.zlen - H) < 0.01, f"{bb.zlen:.2f} mm")
     check("logo strokes", logo.min_stroke(LOGO_H) >= MIN_STROKE,
           f"thinnest {logo.min_stroke(LOGO_H):.2f} mm (>= {MIN_STROKE})")
@@ -210,6 +219,11 @@ def checks(ring, inlay, body=None):
     check("ring and logo do not overlap", overlap < 1e-6, f"{overlap:.5f} mm3")
     check("solids valid", ring.isValid() and inlay.isValid(), "OCC validity")
     return out
+
+
+def xy_scale():
+    """Factor applied to X and Y when the 3MF is written (the model itself is the fitted size)."""
+    return 1 + XY_COMP / 100
 
 
 def mass_g(shape):

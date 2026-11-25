@@ -4,6 +4,22 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/) (0.x until the adapter is printed and measured).
 
+## [0.2.0] - 2026-11-25
+
+### Changed
+
+- **Looser fit after the first print.** The v0.1.1 ring, printed by the user, was much too tight ("muito
+  apertado"): the printer's shrinkage and the usual undersize of printed holes ate the 0.20 mm interference
+  budget. The model stays the fitted ring; the 3MF is now written **0.25 % larger in X and Y** (`XY_COMP`, Z
+  untouched so the logo stays 0.6 mm): outside Ø 199.50 and rib tips Ø 195.79 as drawn, the tips 0.49 mm looser on
+  the diameter. Design estimate, to be confirmed by the next print.
+
+### Added
+
+- `--comp <%>` in `cad/build.py` (a file named `_comp<value>` when it differs from the default), a "print
+  compensation" check (drawn outside diameter inside the CFS's 197–202 mm), the compensation noted on the profile
+  drawing, and the scale table in the README and `docs/design.md` §8 restated for the new file.
+
 ## [0.1.1] - 2026-11-24
 
 ### Fixed

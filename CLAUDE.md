@@ -25,8 +25,12 @@ values labelled, mech look, grey never white).
 
 ## Phase
 
-v0.1.1 (2026-11-24): designed, CAD checks pass, 3MF and renders generated (0.1.1 removed two tab corners that
-stood proud of the rolling surface; any shape near the band must be clipped to the bore). **Not printed yet**: the check items
+v0.2.0 (2026-11-25): CAD checks pass, 3MF and renders generated. 0.1.1 removed two tab corners that stood
+proud of the rolling surface (any shape near the band must be clipped to the bore). **First print (v0.1.1, user
+2026-11-25): "Ficou muito apertado"** → the 3MF is now written 0.25 % larger in X/Y (`XY_COMP`, print
+shrinkage); the model stays the fitted size. Waiting for the result of the next print: if it is loose or still
+tight, change `XY_COMP` by ±0.1 (≈ 0.2 mm on the diameter); a caliper reading across two opposite ribs of a
+printed ring calibrates it exactly. **Not printed yet**: the check items
 are in `docs/design.md` §10. When the user prints and measures, record the real fit and update the status lines
 (README, design.md, CHANGELOG).
 
@@ -34,7 +38,7 @@ are in `docs/design.md` §10. When the user prints and measures, record the real
 
 Closed ring with an L section (decisions and alternatives in `docs/design.md` §2): band Ø 199.0 outside / Ø 196.0
 bore, 1.5 mm wall, 5.2 mm long; 60 axial crush ribs, tips on Ø 195.3 (0.20 mm interference on the diameter, the
-ring stretches 0.10 %); lead-in cone; lip 1.2 mm thick (the only width added per side), 3.0 mm inside the rim on
+ring stretches 0.10 %); these are fitted sizes, the 3MF is 0.25 % larger in X/Y (Ø 199.50 / tips Ø 195.79); lead-in cone; lip 1.2 mm thick (the only width added per side), 3.0 mm inside the rim on
 the flange's outer face; logo tab 45 mm wide on the lip; logo 40 × 13 mm inlaid 0.6 mm in the bed face (= outer
 face), mirrored in the model. Prints lip down; two rings per spool.
 
@@ -45,6 +49,7 @@ face), mirrored in the model. Prints lip down; two rings per spool.
 E:\GitHub\FilamentRecycler\.venv\Scripts\python.exe cad\build.py              # checks + 3MF + renders
 E:\GitHub\FilamentRecycler\.venv\Scripts\python.exe cad\build.py --no-render  # what CI runs
 E:\GitHub\FilamentRecycler\.venv\Scripts\python.exe cad\build.py --rim 194.8 --od 199 --interference 0.2
+E:\GitHub\FilamentRecycler\.venv\Scripts\python.exe cad\build.py --comp 0.35   # looser test file (named _comp0.35)
 ```
 
 CI (`.github/workflows/cad.yml`) runs the checks and uploads the 3MF.
@@ -67,7 +72,7 @@ CI (`.github/workflows/cad.yml`) runs the checks and uploads the 3MF.
 
 When a parameter changes in `cad/spool_adapter.py`:
 
-1. `docs/design.md` — §3 geometry, §4 parameter table, §5 retention numbers, §8 scale table.
+1. `docs/design.md` — §3 geometry, §4 parameter table, §5 retention numbers and print results, §8 scale table.
 2. `README.md` — "How it holds", print and fit sections, the scale table.
 3. `CLAUDE.md` — "Design in one paragraph".
 4. Rebuild (`cad/build.py`): the 3MF and `docs/img/sa01_*.png` (the profile drawing is generated from the

@@ -3,8 +3,9 @@
 The contract for the spool adapter: what it must do, why it looks the way it does, every number and where it
 comes from. The CAD (`cad/spool_adapter.py`) implements this page; when one changes, the other changes with it.
 
-**Status (2026-11-24): designed and checked in CAD, not printed yet.** Only two numbers are measured (the two
-spool diameters, by the user). Everything else is a design value or an estimate, and says so.
+**Status (2026-11-25): first print done, too tight; the 3MF now compensates the print shrinkage (§5, §8).**
+Only two numbers are measured (the two spool diameters, by the user). Everything else is a design value or an
+estimate, and says so.
 
 ## 1. Problem and requirements
 
@@ -83,7 +84,8 @@ All in `cad/spool_adapter.py`. `M` = measured, `D` = design value, `E` = estimat
 |---|---|---|---|
 | `RIM_D` | 195.5 mm | M | Filamentor flange outside diameter (user) |
 | `OD` | 199.0 mm | M | target outside diameter: the Creality spool that works (user); CFS range 197–202 |
-| `INTERFERENCE` | 0.20 mm | D | rib tips vs rim, on the diameter |
+| `INTERFERENCE` | 0.20 mm | D | rib tips vs rim, on the diameter, fitted |
+| `XY_COMP` | 0.25 % | D | the 3MF is this much larger in X/Y than the model (print shrinkage); first print without it: too tight |
 | `RIB_N`, `RIB_H` | 60, 0.35 mm | D | crush ribs |
 | `RIB_TIP_W`, `RIB_BASE_W` | 0.6, 1.6 mm | D | rib tip (above one 0.4 mm line) and base |
 | `LIP_T` | 1.2 mm | D | lip and tab thickness = width added per side |
@@ -122,6 +124,13 @@ the interference becomes about 0.59 mm: the press-on force rises to roughly 130 
 pressing the spool onto the ring on a table) and the strain to 0.3 %, still elastic. That is why the nominal
 interference is small; §8 says how to adjust it.
 
+**First print (v0.1.1, user, 2026-11-25): "muito apertado"** (much too tight), with the 3MF at the model's size.
+So the printer's shrinkage plus the usual undersize of printed holes ate more than the 0.20 mm budget. From
+v0.2.0 the model stays the fitted ring and the 3MF is written **0.25 % larger in X and Y** (`XY_COMP`; Z untouched,
+so the logo stays 0.6 mm): outside Ø 199.50 and rib tips Ø 195.79 as drawn, the tips 0.49 mm looser on the
+diameter. The value is a design estimate; the next print confirms it, and a caliper measurement of a printed
+ring across two opposite ribs (rib *i* and rib *i* + 30) would pin it down.
+
 The ribs make the fit tolerant: the bore between them never touches the rim (0.5 mm clearance on the
 diameter), a seam blob or a slightly oval rim only meets a few ribs, and the ribs press into the rim along their
 length, which also resists turning.
@@ -133,6 +142,7 @@ length, which also resists turning.
   the house format (OutageAlarm, LineFollowerRobot): Creality Print, OrcaSlicer, Bambu Studio and PrusaSlicer load
   it as one object whose parts each take a filament; the colours are base materials, a hint the slicer may
   ignore.
+- **Size**: the 3MF is the model scaled by 1 + `XY_COMP` in X and Y (§5); slice it at 100 %.
 - **Pose**: as modelled, lip down. No supports: the lead-in and chamfers are 45° or steeper, the ribs are vertical.
 - **Colours**: the logo occupies only the first 3 layers (0.6 mm), so the CFS changes colour on 3 layers and the
   rest of the ring is one colour.
@@ -151,17 +161,17 @@ the SVG (`cad/logo.py`). With two colours the dark variant's white "TESLA" becom
 
 ## 8. Fit adjustment and other spools
 
-Without CAD, in the slicer: **scale X and Y only** (Z stays 100 %). 0.1 % changes every diameter by about 0.2 mm,
-and the outside diameter stays well inside the CFS range:
+Without CAD, in the slicer: **scale X and Y only** (Z stays 100 %), starting from the v0.2.0 file (already
++0.25 %). 0.1 % changes every diameter by about 0.2 mm, and the outside diameter stays well inside the CFS range:
 
-| Fit after printing | Scale X/Y | Bore change | Outside diameter |
-|---|---|---|---|
-| loose, turns by hand | 99.8 % | −0.39 mm | 198.6 mm |
-| right | 100 % | — | 199.0 mm |
-| too hard to press on | 100.2 % | +0.39 mm | 199.4 mm |
+| Fit after printing | Scale X/Y | Rebuild equivalent | Rib tips as drawn | Outside as drawn |
+|---|---|---|---|---|
+| loose, turns by hand | 99.9 % | `--comp 0.15` | Ø 195.59 | Ø 199.30 |
+| right | 100 % | `--comp 0.25` (default) | Ø 195.79 | Ø 199.50 |
+| still too hard to press on | 100.1 % | `--comp 0.35` | Ø 195.98 | Ø 199.70 |
 
-With CAD: `python build.py --rim <measured> --od <wanted> --interference <mm>` builds the checks and a 3MF named
-after the values (the renders always show the default adapter).
+With CAD: `python build.py --rim <measured> --od <wanted> --interference <mm> --comp <%>` builds the checks and
+a 3MF named after the values that differ from the defaults (the renders always show the default adapter).
 
 ## 9. Automatic checks (`python build.py`)
 
@@ -179,5 +189,6 @@ is meshed with an absolute tolerance of 0.01 mm (about 314 facets around).
 - [ ] Spool width over the flanges + 2.4 mm ≤ 68 mm (CFS limit).
 - [ ] The flange's outer face is flat where the lip and tab sit (17 mm in from the rim); if there are ribs or
       windows, turn the ring so the tab lands on a flat area.
-- [ ] Press-on force and grip of the first print (depends on the printer's accuracy); adjust with §8.
+- [x] Press-on force of the first print: too tight (2026-11-25) → `XY_COMP` 0.25 % (§5).
+- [ ] Press-on force and grip of the v0.2.0 print; adjust with §8.
 - [ ] Rewind behaviour in the CFS with the adapters, with a full and a nearly empty spool.

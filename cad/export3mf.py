@@ -126,10 +126,15 @@ def write_3mf(path, meshes, name):
         z.writestr("3D/3dmodel.model", "".join(model))
 
 
-def two_colour(path, name, plate_shape, inlay_shape, base=GRAPHITE, accent=YELLOW):
-    """Check and write a plate + inlay pair (both already in print pose). Returns the layer count."""
+def two_colour(path, name, plate_shape, inlay_shape, base=GRAPHITE, accent=YELLOW, xy_scale=1.0):
+    """Check and write a plate + inlay pair (both already in print pose). Returns the layer count.
+    xy_scale enlarges both meshes in X and Y only (print shrinkage compensation); Z is untouched, so the
+    inlay stays exactly LIVERY_DEPTH thick."""
     pv, pt = mesh(plate_shape)
     iv, it = mesh(inlay_shape, tol=0.01)
+    if xy_scale != 1.0:
+        pv = [(x * xy_scale, y * xy_scale, z) for x, y, z in pv]
+        iv = [(x * xy_scale, y * xy_scale, z) for x, y, z in iv]
     check_closed(name + " plate", pt)
     check_closed(name + " inlay", it)
     if volume(pv, pt) <= 0 or volume(iv, it) <= 0:
