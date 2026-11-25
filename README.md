@@ -7,10 +7,11 @@ logo on a small tab; no screws, no glue. Two versions: **with five small hooks**
 
 ![SA-01 on a spool](docs/img/sa01_hero.png)
 
-> **Status: v1.1.0 (2026-11-25), both versions printed.** With hooks: the v1.0.0 file, printed and in use. Without
-> hooks: a file identical in content to the v0.2.0 print, whose size the user confirmed. Both are
-> 0.25 % larger in X/Y for the printer's shrinkage. The spool's diameter and flange thickness are measured; every
-> other number (forces, torque, mass) is a design value or an estimate. See the [changelog](CHANGELOG.md).
+> **Status: v1.2.0 (2026-11-25).** With hooks: the v1.0.0 file, printed and in use, 0.25 % larger in X/Y for the
+> printer's shrinkage. Without hooks: the v0.2.0 ring (size confirmed by that print), now written 0.35 % larger in
+> X/Y for an easier fit, as asked; this looser file is not printed yet. The spool's diameter and flange thickness are
+> measured; every other number (forces, torque, mass) is a design value or an estimate. See the
+> [changelog](CHANGELOG.md).
 
 ## Two versions
 
@@ -20,11 +21,12 @@ logo on a small tab; no screws, no glue. Two versions: **with five small hooks**
 | Height (lip + band) | 6.2 mm (1.2 + 5.0) | 5.2 mm (1.2 + 4.0) |
 | Holds by | crush ribs + five snap hooks behind the flange: it cannot walk off | crush ribs only (friction) |
 | Fit and removal | one side first, each hook clicks; removal one hook at a time | pressed on evenly; pushed off from the filament side |
+| File scale in X/Y | +0.25 % (Ø 199.50 outside, rib tips Ø 195.79 as drawn) | +0.35 %, a little looser (Ø 199.70, tips Ø 195.98) |
 | Mass (estimate) | about 11 g per ring | about 10 g per ring |
-| Printed | v0.3.0 = v1.0.0: "Ficou bom" | v0.2.0: "O tamanho ficou bom" |
+| Printed | v0.3.0 = v1.0.0: "Ficou bom" | v0.2.0 at +0.25 %: "O tamanho ficou bom"; the +0.35 % file not yet |
 
-Same outside diameter (199.0 mm), same ribs and fit, same lip, tab and logo; only the band's length and the hooks
-differ.
+Same model diameters (199.0 mm outside), same ribs, lip, tab and logo; the band's length, the hooks and the scale
+of the file differ.
 
 ## Why
 
@@ -72,7 +74,7 @@ Download the version you want from [`3mf/`](3mf/) (table above), or from the
    logo the second colour (yellow). The colours in the file are only a hint.
 2. Keep it as it comes: **lip on the plate**, **scale 100 %**. The file is deliberately 0.25 % larger in X and Y
    than the fitted ring (Ø 199.5 mm outside as drawn) because large printed rings shrink; the print comes out at
-   about 199 mm. The logo is in the first 3 layers, on the face against the plate, so
+   about 199 mm. The version without hooks is 0.35 % larger (Ø 199.7 mm as drawn), for an easier fit. The logo is in the first 3 layers, on the face against the plate, so
    the CFS changes colour on those 3 layers only.
 3. Settings: 0.4 mm nozzle, **0.2 mm layers including the first**, 4 walls, no supports, **no brim**.
    PETG is preferred, PLA works. About 11 g per ring with hooks, 10 g without (estimates). The hooks' flat
@@ -103,8 +105,10 @@ diameters by about 0.2 mm and the outside stays well inside the CFS range (197�
 
 | Fit | Scale X/Y | Same as rebuilding with |
 |---|---|---|
-| loose, turns by hand | 99.9 % | `--comp 0.15` |
-| still too hard to press on | 100.1 % | `--comp 0.35` |
+| loose, turns by hand | 99.9 % | `--comp 0.15` (with hooks), `--comp 0.25` (without) |
+| still too hard to press on | 100.1 % | `--comp 0.35` (with hooks), `--comp 0.45` (without) |
+
+`--comp` sets the scale of both versions; the defaults are 0.25 % with hooks and 0.35 % without.
 
 ## Another spool
 

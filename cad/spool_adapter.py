@@ -32,7 +32,10 @@ FLANGE_T = 3.3         # measured (user, 2026-11-25): Filamentor flange thicknes
 INTERFERENCE = 0.20    # rib tips vs the rim, on the diameter: the ring stretches this much when fitted
 XY_COMP = 0.25         # %: the 3MF is this much larger in X and Y than the model, for the printer's shrinkage.
                        # First print with 0 (v0.1.1, user 2026-11-25): "muito apertado"; 0.25 % opens the rib
-                       # tips by 0.49 mm on the diameter; confirmed by the v0.2.0 print ("O tamanho ficou bom")
+                       # tips by 0.49 mm on the diameter; confirmed by the v0.2.0 print ("O tamanho ficou bom").
+                       # This is the value for the variant with hooks.
+XY_COMP_NO_HOOKS = 0.35  # %: the same for the variant without hooks, 0.1 % looser (user 2026-11-25: "um pouco mais
+                       # larga", i.e. an easier fit): rib tips 0.2 mm larger on the diameter than the v0.2.0 print
 RIB_N = 60             # axial crush ribs on the bore, one every 6 deg
 RIB_H = 0.35           # rib height above the bore
 RIB_TIP_W = 0.6        # flat tip width (printable: > one 0.4 mm line)
@@ -72,13 +75,15 @@ def _layer_ceil(z):
 
 def configure(rim_d=None, od=None, interference=None, comp=None, flange_t=None, hooks=None):
     """Set the inputs (for another spool: python build.py --rim 194.8 --od 199 --flange 2.5) and the
-    variant (hooks=True/False), and derive the rest. Values left as None keep their current setting."""
-    global RIM_D, OD, INTERFERENCE, XY_COMP, FLANGE_T, HOOKS, R_OUT, R_RIM, R_TIP, R_BORE, R_LIP_IN, H, BAND_L
-    global BAND_T, LOGO_W, TAB_W, TAB_Y, LOGO_TOP, Z_CATCH, R_HOOK
+    variant (hooks=True/False), and derive the rest. Values left as None keep their current setting; comp
+    sets the compensation of both variants."""
+    global RIM_D, OD, INTERFERENCE, XY_COMP, XY_COMP_NO_HOOKS, FLANGE_T, HOOKS, R_OUT, R_RIM, R_TIP, R_BORE
+    global R_LIP_IN, H, BAND_L, BAND_T, LOGO_W, TAB_W, TAB_Y, LOGO_TOP, Z_CATCH, R_HOOK
     RIM_D = RIM_D if rim_d is None else rim_d
     OD = OD if od is None else od
     INTERFERENCE = INTERFERENCE if interference is None else interference
-    XY_COMP = XY_COMP if comp is None else comp
+    if comp is not None:
+        XY_COMP = XY_COMP_NO_HOOKS = comp
     FLANGE_T = FLANGE_T if flange_t is None else flange_t
     HOOKS = HOOKS if hooks is None else hooks
     R_OUT = OD / 2
@@ -253,8 +258,8 @@ def checks(ring, inlay, body=None):
     check("hoop strain when fitted", INTERFERENCE / RIM_D < 0.004,
           f"{100 * INTERFERENCE / RIM_D:.2f} % (PETG and PLA stay elastic far beyond 1 %)")
     k = xy_scale()
-    check("print compensation", 0 <= XY_COMP <= 1.0 and 197.0 <= OD * k <= 202.0,
-          f"3MF {XY_COMP:g} % larger in X/Y: outside D {OD * k:.2f}, rib tips D {2 * R_TIP * k:.2f} as drawn "
+    check("print compensation", 0 <= xy_comp() <= 1.0 and 197.0 <= OD * k <= 202.0,
+          f"3MF {xy_comp():g} % larger in X/Y: outside D {OD * k:.2f}, rib tips D {2 * R_TIP * k:.2f} as drawn "
           f"(CFS 197-202)")
     check("fits the bed", bb.xlen * k <= BED[0] and bb.ylen * k <= BED[1],
           f"{bb.xlen * k:.0f} x {bb.ylen * k:.0f} on {BED}")
@@ -316,7 +321,12 @@ def checks(ring, inlay, body=None):
 
 def xy_scale():
     """Factor applied to X and Y when the 3MF is written (the model itself is the fitted size)."""
-    return 1 + XY_COMP / 100
+    return 1 + xy_comp() / 100
+
+
+def xy_comp():
+    """Print shrinkage compensation (%) of the current variant."""
+    return XY_COMP if HOOKS else XY_COMP_NO_HOOKS
 
 
 def mass_g(shape):

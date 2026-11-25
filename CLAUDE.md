@@ -28,13 +28,17 @@ values labelled, mech look, grey never white).
 - 2026-11-25, after the hooks print: "Esse com os dentes ficou perfeito. Agora preciso de um do mesmo tamanho, sem
   os dentes, e da espessura da versão anterior a versão com dentes." → a second variant, without hooks, 5.2 mm
   overall (the v0.2.0 ring). Both variants are kept and built.
+- 2026-11-25: "Faça a versão sem ganchos um pouco mais larga. Pouca coisa." Asked what "larga" meant, the user
+  chose **"Encaixe mais folgado"** (a looser fit, not a longer band or a larger outside) → `XY_COMP_NO_HOOKS`
+  0.35 % (the hooks variant stays at 0.25 %).
 
 ## Phase
 
-**v1.1.0 (2026-11-25): two variants, both printed** (tag `v1.1.0`, GitHub release with both 3MFs attached):
-- **with hooks** (default, `HOOKS = True`): the v1.0.0 ring, "perfeito";
-- **without hooks** (`HOOKS = False`, `_no-hooks` 3MF): the v0.2.0 ring, its 3MF identical in content to the
-  v0.2.0 print (size confirmed then).
+**v1.2.0 (2026-11-25): two variants** (tag `v1.2.0`, GitHub release with both 3MFs attached):
+- **with hooks** (default, `HOOKS = True`): the v1.0.0 ring, "perfeito", 3MF +0.25 % — unchanged;
+- **without hooks** (`HOOKS = False`, `_no-hooks` 3MF): the v0.2.0 ring, 3MF **+0.35 %** in X/Y from v1.2.0 (a
+  little looser than the v0.2.0 print, as asked). **The +0.35 % file is not printed yet**: when the user reports,
+  record it; if it turns or slides off, try 0.30 %; if still hard, 0.45 %.
 
 History of the fit:
 - 0.1.1 removed two tab corners that stood proud of the rolling surface (any shape near the band must be clipped
@@ -45,6 +49,7 @@ History of the fit:
 - v0.3.0 adds five snap hooks behind the 3.3 mm flange. **Third print (v0.3.0): "Impresso. Ficou bom"** → released
   unchanged as v1.0.0 (same 3MF).
 - v1.1.0 adds the variant without hooks back, as asked; nothing changes in the hooks variant.
+- v1.2.0 makes the variant without hooks 0.1 % looser (`XY_COMP_NO_HOOKS` 0.35 %); the hooks 3MF is unchanged.
 - Rebuilding writes new zip timestamps into a 3MF whose content did not change: compare the entries (as done for
   v1.0.0/v1.1.0) and keep the committed file, which is the one that was printed.
 - Any later change is a new version: record the user's print result (README status, design.md §5/§10, CHANGELOG),
@@ -62,7 +67,8 @@ behind the rim, flat catch at z 4.6 = lip 1.2 + flange 3.3 + 0.1, 45° ramp); th
 3.0 mm inside the rim on the flange's outer face; logo tab 45 mm wide on the lip; logo 40 × 13 mm inlaid 0.6 mm in the bed face (= outer
 face), mirrored in the model. Prints lip down; two rings per spool. **Variant without hooks** (`HOOKS = False`):
 the same ring with no hooks and the band `PLAIN_BAND_L` = 4.0 mm past the lip (5.2 mm overall); the ribs press on
-2.8 of the 3.3 mm flange; held by friction only; 9.8 g.
+2.8 of the 3.3 mm flange; held by friction only; 9.8 g; its 3MF is 0.35 % larger in X/Y (Ø 199.70 / tips
+Ø 195.98), a little looser than the hooks variant.
 
 ## Commands
 
@@ -72,7 +78,7 @@ E:\GitHub\FilamentRecycler\.venv\Scripts\python.exe cad\build.py              # 
 E:\GitHub\FilamentRecycler\.venv\Scripts\python.exe cad\build.py --no-render  # what CI runs
 E:\GitHub\FilamentRecycler\.venv\Scripts\python.exe cad\build.py --variant no-hooks   # one variant (hooks | no-hooks)
 E:\GitHub\FilamentRecycler\.venv\Scripts\python.exe cad\build.py --rim 194.8 --flange 2.5 --od 199
-E:\GitHub\FilamentRecycler\.venv\Scripts\python.exe cad\build.py --comp 0.35   # looser test file (named _comp0.35)
+E:\GitHub\FilamentRecycler\.venv\Scripts\python.exe cad\build.py --comp 0.35   # sets both variants' compensation (files named _comp<v> when not the default)
 ```
 
 CI (`.github/workflows/cad.yml`) runs the checks and uploads the 3MF.

@@ -3,10 +3,11 @@
 The contract for the spool adapter: what it must do, why it looks the way it does, every number and where it
 comes from. The CAD (`cad/spool_adapter.py`) implements this page; when one changes, the other changes with it.
 
-**Status (2026-11-25): v1.1.0, two variants, both printed.** The size (v0.2.0 print, 3MF +0.25 % in X/Y, §5) and
-the five snap hooks behind the flange (v0.3.0 print, §3a) fit, per the user. The variant without hooks (§3b) is the
-v0.2.0 ring, its 3MF identical in content to the one printed then. Measured by the user: the two spool diameters
-and the flange thickness. Everything else is a design value or an estimate, and says so.
+**Status (2026-11-25): v1.2.0, two variants.** The size (v0.2.0 print, 3MF +0.25 % in X/Y, §5) and the five snap
+hooks behind the flange (v0.3.0 print, §3a) fit, per the user. The variant without hooks (§3b) is the v0.2.0 ring;
+from v1.2.0 its 3MF is 0.35 % larger in X/Y, a little looser than the v0.2.0 print, as the user asked; not printed
+yet. Measured by the user: the two spool diameters and the flange thickness. Everything else is a design value or
+an estimate, and says so.
 
 ## 1. Problem and requirements
 
@@ -26,6 +27,7 @@ User requirements (2026-11-24):
 | R4 | Public GitHub repository `SpoolAdapter` with README and CLAUDE.md. | user |
 | R5 | (2026-11-25, after the size was right) **five small teeth to hold the adapter in place**: hooks that pass the rim and lock behind the flange. Filamentor flange **3.3 mm** thick at the rim. | user, measured |
 | R6 | (2026-11-25, after the hooks were right) **also a ring of the same size without the teeth, as thick as the version before the hooks** (v0.2.0: 5.2 mm overall). | user |
+| R7 | (2026-11-25) **the ring without hooks "a little wider", "pouca coisa"**: confirmed as an easier (looser) fit on the rim. | user |
 
 Derived requirements:
 
@@ -107,8 +109,11 @@ the logo.
   edge, so the ribs press on the rim from the lip up to z ≈ 4.0 mm, 2.8 of the 3.3 mm flange (checked: at least
   75 %); in the hooks variant the band is 1 mm longer and the ribs cover the whole flange.
 - **Axial hold**: friction only, about the press-on force (§5); nothing locks it behind the flange.
-- **Same 3MF as printed**: `SpoolAdapter_195.5-to-199mm_no-hooks_2color.3mf` has the same content (model, mesh,
-  parts) as the v0.2.0 file, compared entry by entry; only the zip timestamps differ.
+- **A little looser (v1.2.0, R7)**: `SpoolAdapter_195.5-to-199mm_no-hooks_2color.3mf` is written 0.35 % larger in
+  X/Y (`XY_COMP_NO_HOOKS`), 0.1 % more than the hooks variant and the v0.2.0 print: outside Ø 199.70 and rib tips
+  Ø 195.98 as drawn, the tips about 0.2 mm larger on the diameter than in the printed v0.2.0 ring (the step the
+  §8 table gives for "still too hard to press on"). The model is unchanged. In v1.1.0 this file had the same
+  content as the v0.2.0 file (compared entry by entry).
 
 ## 4. Parameters
 
@@ -119,7 +124,8 @@ All in `cad/spool_adapter.py`. `M` = measured, `D` = design value, `E` = estimat
 | `RIM_D` | 195.5 mm | M | Filamentor flange outside diameter (user) |
 | `OD` | 199.0 mm | M | target outside diameter: the Creality spool that works (user); CFS range 197–202 |
 | `INTERFERENCE` | 0.20 mm | D | rib tips vs rim, on the diameter, fitted |
-| `XY_COMP` | 0.25 % | D | the 3MF is this much larger in X/Y than the model (print shrinkage); first print without it: too tight |
+| `XY_COMP` | 0.25 % | D | the 3MF is this much larger in X/Y than the model (print shrinkage); first print without it: too tight. Variant with hooks |
+| `XY_COMP_NO_HOOKS` | 0.35 % | D | the same for the variant without hooks: 0.1 % looser, for an easier fit (R7) |
 | `RIB_N`, `RIB_H` | 60, 0.35 mm | D | crush ribs |
 | `RIB_TIP_W`, `RIB_BASE_W` | 0.6, 1.6 mm | D | rib tip (above one 0.4 mm line) and base |
 | `LIP_T` | 1.2 mm | D | lip and tab thickness = width added per side |
@@ -180,8 +186,11 @@ The hooks of v0.3.0 scale with it, so they keep their 0.5 mm reach behind the pr
 hooks fits and holds on the Filamentor spool. Released unchanged as v1.0.0. Not measured: the press-on force, the
 torque before the ring turns and the hooks' pull-out force; the numbers above remain estimates.
 
-**Variant without hooks (v1.1.0)**: its 3MF has the same content as the v0.2.0 print, so the size result of the
-second print applies to it.
+**Variant without hooks**: in v1.1.0 its 3MF had the same content as the v0.2.0 print. From v1.2.0 it is 0.1 %
+looser (R7): the rib tips are about 0.2 mm larger on the diameter than in the v0.2.0 print, so the real
+interference, and with it the clamping force, torque and axial hold above, is smaller by an amount that cannot be
+given (the v0.2.0 interference was not measured). If the ring turns on the rim or slides off, go back to 0.30 %
+or 0.25 % (§8).
 
 The ribs make the fit tolerant: the bore between them never touches the rim (0.5 mm clearance on the
 diameter), a seam blob or a slightly oval rim only meets a few ribs, and the ribs press into the rim along their
@@ -215,8 +224,8 @@ the SVG (`cad/logo.py`). With two colours the dark variant's white "TESLA" becom
 
 ## 8. Fit adjustment and other spools
 
-Without CAD, in the slicer: **scale X and Y only** (Z stays 100 %), starting from the v0.2.0 file (already
-+0.25 %). 0.1 % changes every diameter by about 0.2 mm, and the outside diameter stays well inside the CFS range:
+Without CAD, in the slicer: **scale X and Y only** (Z stays 100 %), starting from the file with hooks (already
++0.25 %; the table) or the file without hooks (already +0.35 %; add 0.10 to each `--comp` value). 0.1 % changes every diameter by about 0.2 mm, and the outside diameter stays well inside the CFS range:
 
 | Fit after printing | Scale X/Y | Rebuild equivalent | Rib tips as drawn | Outside as drawn |
 |---|---|---|---|---|
@@ -226,7 +235,8 @@ Without CAD, in the slicer: **scale X and Y only** (Z stays 100 %), starting fro
 
 With CAD: `python build.py --rim <measured> --flange <measured> --od <wanted> --interference <mm> --comp <%>`
 builds the checks and the 3MFs of both variants (named after the fit values that differ from the defaults; the
-renders always show the default adapter); `--variant hooks` or `--variant no-hooks` builds only one. The hooks
+renders always show the default adapter); `--variant hooks` or `--variant no-hooks` builds only one. `--comp`
+sets the compensation of both variants (defaults 0.25 % with hooks, 0.35 % without). The hooks
 follow `--flange`; without hooks the band stays 4.0 mm past the lip and the build checks that it still covers the
 flange.
 
@@ -253,5 +263,6 @@ is meshed with an absolute tolerance of 0.01 mm (about 314 facets around).
 - [x] Press-on force of the first print: too tight (2026-11-25) → `XY_COMP` 0.25 % (§5).
 - [x] Size of the v0.2.0 print: right (user, 2026-11-25).
 - [x] v0.3.0 hooks printed and fitted: "Ficou bom" (user, 2026-11-25).
-- [x] Variant without hooks: same 3MF content as the v0.2.0 print (compared, 2026-11-25).
+- [x] Variant without hooks, v1.1.0: same 3MF content as the v0.2.0 print (compared, 2026-11-25).
+- [ ] Variant without hooks, v1.2.0 at +0.35 %: easier to press on, and still does not turn or slide off the rim.
 - [ ] Rewind behaviour in the CFS with the adapters, with a full and a nearly empty spool.

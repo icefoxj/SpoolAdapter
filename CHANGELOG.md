@@ -4,6 +4,21 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/) (0.x until the adapter was printed and confirmed; 1.0.0 is the first confirmed print).
 
+## [1.2.0] - 2026-11-25
+
+### Changed
+
+- **The variant without hooks fits a little looser** (user: "um pouco mais larga. Pouca coisa"; asked, chose a
+  looser fit): its 3MF is now 0.35 % larger in X/Y (`XY_COMP_NO_HOOKS`, was 0.25 %): outside Ø 199.70 and rib tips
+  Ø 195.98 as drawn, the tips about 0.2 mm larger on the diameter than in the v0.2.0 print. The model is unchanged.
+  Not printed yet.
+- `--comp` sets the compensation of both variants; a variant's 3MF gets a `_comp<value>` suffix only when it
+  differs from that variant's default. The profile drawing without hooks states its 0.35 %.
+
+### Unchanged
+
+- The variant with hooks and its 3MF (the v1.0.0 file, 0.25 %).
+
 ## [1.1.0] - 2026-11-25
 
 ### Added
@@ -101,5 +116,6 @@ design value or an estimate.
   concept and alternatives, parameters, retention estimates, fit adjustment, check items), CI that runs the checks
   and builds the 3MF.
 
+[1.2.0]: https://github.com/icefoxj/SpoolAdapter/releases/tag/v1.2.0
 [1.1.0]: https://github.com/icefoxj/SpoolAdapter/releases/tag/v1.1.0
 [1.0.0]: https://github.com/icefoxj/SpoolAdapter/releases/tag/v1.0.0

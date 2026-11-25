@@ -33,7 +33,8 @@ REPO = os.path.normpath(os.path.join(HERE, ".."))
 IMG = os.path.join(REPO, "docs", "img")
 
 
-DEFAULT_FIT = (sa.INTERFERENCE, sa.XY_COMP)
+DEFAULT_INTERFERENCE = sa.INTERFERENCE
+DEFAULT_COMP = {True: sa.XY_COMP, False: sa.XY_COMP_NO_HOOKS}     # by variant (HOOKS)
 VARIANTS = {"hooks": True, "no-hooks": False}
 
 
@@ -41,10 +42,10 @@ def out_3mf():
     name = f"SpoolAdapter_{sa.RIM_D:g}-to-{sa.OD:g}mm_2color.3mf"
     if not sa.HOOKS:
         name = name.replace("_2color", "_no-hooks_2color")
-    if abs(sa.INTERFERENCE - DEFAULT_FIT[0]) > 1e-9:
+    if abs(sa.INTERFERENCE - DEFAULT_INTERFERENCE) > 1e-9:
         name = name.replace("_2color", f"_fit{sa.INTERFERENCE:g}_2color")
-    if abs(sa.XY_COMP - DEFAULT_FIT[1]) > 1e-9:
-        name = name.replace("_2color", f"_comp{sa.XY_COMP:g}_2color")
+    if abs(sa.xy_comp() - DEFAULT_COMP[sa.HOOKS]) > 1e-9:
+        name = name.replace("_2color", f"_comp{sa.xy_comp():g}_2color")
     return os.path.join(REPO, "3mf", name)
 
 # The spool in the renders is an illustration: only its diameter and flange thickness are measured.
@@ -199,9 +200,11 @@ def profile(path):
     ax.text(89.5, -3.6, f"Interference {sa.INTERFERENCE:.2f} mm on the diameter: the closed ring stretches "
             f"{100 * sa.INTERFERENCE / sa.RIM_D:.2f} % and clamps the rim. Design values; dimensions in mm.",
             fontsize=8, color="#55595F")
-    ax.text(89.5, -4.3, f"Fitted sizes. The 3MF is {sa.XY_COMP:g} % larger in X/Y for the printer's shrinkage "
+    why = ("the first print, without it, was too tight." if sa.HOOKS else
+           f"{sa.xy_comp() - sa.XY_COMP:.2g} % more than with hooks, for an easier fit.")
+    ax.text(89.5, -4.3, f"Fitted sizes. The 3MF is {sa.xy_comp():g} % larger in X/Y for the printer's shrinkage "
             f"(outside Ø {sa.OD * sa.xy_scale():.2f}, rib tips Ø {2 * sa.R_TIP * sa.xy_scale():.2f} as drawn): "
-            f"the first print, without it, was too tight.", fontsize=8, color="#55595F")
+            + why, fontsize=8, color="#55595F")
     # title band (mech look): unit code knocked out of a yellow band with a 45 deg cut
     ax.add_patch(Polygon([(89.5, 11.0), (92.4, 11.0), (93.0, 11.6), (89.5, 11.6)], closed=True, fc=Y, ec="none",
                          clip_on=False))
@@ -226,7 +229,8 @@ def main():
     ap.add_argument("--interference", type=float, help=f"rib tips vs rim, on the diameter (default {sa.INTERFERENCE})")
     ap.add_argument("--flange", type=float, help=f"measured flange thickness at the rim (default {sa.FLANGE_T})")
     ap.add_argument("--comp", type=float,
-                    help=f"%% larger in X/Y in the 3MF, for print shrinkage (default {sa.XY_COMP}; looser = more)")
+                    help=f"%% larger in X/Y in the 3MF, for print shrinkage, both variants (default "
+                         f"{sa.XY_COMP} with hooks, {sa.XY_COMP_NO_HOOKS} without; looser = more)")
     ap.add_argument("--variant", choices=[*VARIANTS, "both"], default="both",
                     help="with the snap hooks, without them, or both (default)")
     args = ap.parse_args()
@@ -248,7 +252,7 @@ def build_variant(hooks, args, custom):
     log(f"SA-01 spool adapter, {'with ' + str(sa.HOOK_N) + ' snap hooks' if sa.HOOKS else 'no hooks'}")
     log(f"   rim {sa.RIM_D} -> outside {sa.OD} mm, interference {sa.INTERFERENCE} mm, {sa.RIB_N} ribs, "
         f"lip {sa.LIP_T} mm, band {sa.BAND_L:.1f} mm (height {sa.H:.1f}), flange {sa.FLANGE_T} mm, "
-        f"3MF +{sa.XY_COMP:g} % in X/Y")
+        f"3MF +{sa.xy_comp():g} % in X/Y")
     body = sa.ring_body()
     ring, inlay = sa.build()
     results = sa.checks(ring, inlay, body)
